@@ -18,8 +18,6 @@
 - number of characters in words (Niklas)
 - average char per word (Niklas)
 - absolute difference between avg char (Niklas)
-- word density (word count / char count (Niklas)
-- average numbers of letters per word (Niklas)
 - named numbers (Niklas)
 - amount of direct translations (Jakob)
 - named entities (Jakob)
