@@ -1,9 +1,8 @@
 # crosslingual-information-retrieval
-==============================
 
-# Possible Features
+## Possible Features
 
-## Sentence based features
+### Sentence based features
 - number of words as feature
 - differences of words absolute and relative with respect to smaller number as base
 - total number of chars
@@ -11,11 +10,11 @@
 - number of stopwords
 - sentiment analysis
 
-## Grammar based features
+### Grammar based features
 - pos-tagger and get number of nouns, verbs, adjectives
 - verb times
 
-## Word based features
+### Word based features
 - number of characters in words 
 - average char per word
 - absolute difference between avg char
@@ -25,10 +24,10 @@
 - named entities
 - named numbers
 
-## Word embedding based features
+### Word embedding based features
 - word embeddings
 
-## Punctuation features
+### Punctuation features
 - number of punctuation marks / differences of punctuation marks absolute and relative with respect to smaller number as base
 - number of question marks
 - number of exclamation marks
@@ -45,7 +44,7 @@
 
 
 
-# Project Organization
+## Project Organization
 
     ├── LICENSE
     ├── Makefile           <- Makefile with commands like `make data` or `make train`
