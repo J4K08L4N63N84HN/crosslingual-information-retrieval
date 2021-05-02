@@ -1,10 +1,51 @@
-crosslingual-information-retrieval
+# crosslingual-information-retrieval
 ==============================
 
-A short description of the project.
+# Possible Features
 
-Project Organization
-------------
+## Sentence based features
+- number of words as feature
+- differences of words absolute and relative with respect to smaller number as base
+- total number of chars
+- number of unique words
+- number of stopwords
+- sentiment analysis
+
+## Grammar based features
+- pos-tagger and get number of nouns, verbs, adjectives
+- verb times
+
+## Word based features
+- number of characters in words 
+- average char per word
+- absolute difference between avg char
+- amount of direct translations
+- average numbers of letters per word
+- word density (word count / char count)
+- named entities
+- named numbers
+
+## Word embedding based features
+- word embeddings
+
+## Punctuation features
+- number of punctuation marks / differences of punctuation marks absolute and relative with respect to smaller number as base
+- number of question marks
+- number of exclamation marks
+- number of commas
+- number of semicolons
+- number of colons
+- number of ellipsis
+- number of apostrophes
+- number of hyphens 
+- number of quotation marks
+- number of slashes
+- number of brackets
+- number of special characters
+
+
+
+# Project Organization
 
     ├── LICENSE
     ├── Makefile           <- Makefile with commands like `make data` or `make train`
@@ -53,5 +94,3 @@ Project Organization
 
 
 --------
-
-<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
