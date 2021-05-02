@@ -25,7 +25,7 @@
 - named numbers
 
 ### Word embedding based features
-- word embeddings
+- word embeddings (average, weighted average etc.)
 
 ### Punctuation features
 - number of punctuation marks / differences of punctuation marks absolute and relative with respect to smaller number as base
