@@ -3,44 +3,45 @@
 ## Possible Features
 
 ### Sentence based features
-- number of words as feature
-- differences of words absolute and relative with respect to smaller number as base
-- total number of chars
-- number of unique words
-- number of stopwords
-- sentiment analysis
+- number of words as feature (Niklas)
+- differences of words absolute and relative with respect to smaller number as base (Niklas)
+- total number of chars (Niklas)
+- number of unique words (Niklas)
+- number of stopwords (Niklas)
+- sentiment analysis (Jakob)
 
 ### Grammar based features
-- pos-tagger and get number of nouns, verbs, adjectives
-- verb times
+- pos-tagger and get number of nouns, verbs, adjectives (Niklas)
+- verb times (Niklas)
 
 ### Word based features
-- number of characters in words 
-- average char per word
-- absolute difference between avg char
-- amount of direct translations
-- average numbers of letters per word
-- word density (word count / char count)
+- number of characters in words (Niklas)
+- average char per word (Niklas)
+- absolute difference between avg char (Niklas)
+- word density (word count / char count (Niklas)
+- average numbers of letters per word (Niklas)
+- named numbers (Niklas)
+- amount of direct translations (Jakob)
 - named entities (Jakob)
-- named numbers
+
 
 ### Word embedding based features
-- word embeddings (average, weighted average etc.)
+- word embeddings (average, weighted average etc.) (Jakob)
 
 ### Punctuation features
-- number of punctuation marks / differences of punctuation marks absolute and relative with respect to smaller number as base
-- number of question marks
-- number of exclamation marks
-- number of commas
-- number of semicolons
-- number of colons
-- number of ellipsis
-- number of apostrophes
-- number of hyphens 
-- number of quotation marks
-- number of slashes
-- number of brackets
-- number of special characters
+- number of punctuation marks (Niklas) delete real sentence ending points
+- number of question marks (Niklas)
+- number of exclamation marks (Niklas)
+- number of commas (Niklas)
+- number of semicolons (Niklas)
+- number of colons (Niklas)
+- number of ellipsis (Niklas)
+- number of apostrophes (Niklas)
+- number of hyphens (Niklas)
+- number of quotation marks (Niklas)
+- number of slashes (Niklas)
+- number of brackets (Niklas)
+- number of special characters (Niklas)
 
 
 
