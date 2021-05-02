@@ -17,7 +17,7 @@ def to_sentences(doc):
     return doc.strip().split('\n')
 
 
-def import_data(file_eng='europarl-v7.de-en.en', file_ger='europarl-v7.de-en.de'):
+def import_data(file_eng='../data/external/europarl-v7.de-en.en', file_ger='../data/external/europarl-v7.de-en.de'):
     """ Function to import the data and concatenate it into a dataframe. """
     # load English data
     doc_eng = load_doc(file_eng)
