@@ -21,7 +21,7 @@
 - amount of direct translations
 - average numbers of letters per word
 - word density (word count / char count)
-- named entities
+- named entities (Jakob)
 - named numbers
 
 ### Word embedding based features
