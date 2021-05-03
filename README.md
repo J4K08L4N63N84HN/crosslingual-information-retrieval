@@ -3,7 +3,7 @@
 ## Possible Features
 
 ### write frist feature generation function
-    Niklas
+- Niklas
 
 ### Sentence based features
 - number of words as feature (Niklas) -> done
