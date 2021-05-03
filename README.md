@@ -2,7 +2,7 @@
 
 ## Possible Features
 
-### write frist feature generation function
+### Write frist feature generation function
 - Niklas
 
 ### Sentence based features
