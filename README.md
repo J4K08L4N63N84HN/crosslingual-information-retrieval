@@ -18,7 +18,7 @@
 - number of characters in words (Niklas) -> done
 - average char per word (Niklas) -> done
 - absolute difference between avg char (Niklas) -> done
-- named numbers (Niklas) -> done (included in POS Tagger NUM
+- named numbers (Niklas) -> done (included in POS Tagger NUM)
 - amount of direct translations (Jakob)
 - named entities (Jakob)
 
