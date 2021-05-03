@@ -3,22 +3,22 @@
 ## Possible Features
 
 ### Sentence based features
-- number of words as feature (Niklas)
-- differences of words absolute and relative with respect to smaller number as base (Niklas)
-- total number of chars (Niklas)
+- number of words as feature (Niklas) -> done
+- differences of words absolute and relative with respect to smaller number as base (Niklas) -> done
+- total number of chars (Niklas) -> done
 - number of unique words (Niklas)
 - number of stopwords (Niklas)
 - sentiment analysis (Jakob)
 
 ### Grammar based features
-- pos-tagger and get number of nouns, verbs, adjectives (Niklas)
+- pos-tagger and get number of nouns, verbs, adjectives (Niklas) -> done
 - verb times (Niklas)
 
 ### Word based features
-- number of characters in words (Niklas)
-- average char per word (Niklas)
-- absolute difference between avg char (Niklas)
-- named numbers (Niklas)
+- number of characters in words (Niklas) -> done
+- average char per word (Niklas) -> done
+- absolute difference between avg char (Niklas) -> done
+- named numbers (Niklas) -> done (included in POS Tagger NUM
 - amount of direct translations (Jakob)
 - named entities (Jakob)
 
@@ -27,7 +27,7 @@
 - word embeddings (average, weighted average etc.) (Jakob)
 
 ### Punctuation features
-- number of punctuation marks (Niklas) delete real sentence ending points
+- number of punctuation marks (Niklas) delete real sentence ending points, cause sometimes two sentences in one language will be mapped to one sentence in the other language
 - number of question marks (Niklas)
 - number of exclamation marks (Niklas)
 - number of commas (Niklas)
