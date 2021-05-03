@@ -6,7 +6,7 @@
 - number of words as feature (Niklas) -> done
 - differences of words absolute and relative with respect to smaller number as base (Niklas) -> done
 - total number of chars (Niklas) -> done
-- number of unique words (Niklas)
+- number of unique words (Niklas) -> done
 - number of stopwords (Niklas) -> done
 - sentiment analysis (Jakob)
 
