@@ -2,6 +2,9 @@
 
 ## Possible Features
 
+# write frist feature generation function
+    Niklas
+
 ### Sentence based features
 - number of words as feature (Niklas) -> done
 - differences of words absolute and relative with respect to smaller number as base (Niklas) -> done
