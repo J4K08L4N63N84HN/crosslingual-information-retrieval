@@ -7,7 +7,7 @@
 - differences of words absolute and relative with respect to smaller number as base (Niklas) -> done
 - total number of chars (Niklas) -> done
 - number of unique words (Niklas)
-- number of stopwords (Niklas)
+- number of stopwords (Niklas) -> done
 - sentiment analysis (Jakob)
 
 ### Grammar based features
@@ -27,19 +27,19 @@
 - word embeddings (average, weighted average etc.) (Jakob)
 
 ### Punctuation features
-- number of punctuation marks (Niklas) delete real sentence ending points, cause sometimes two sentences in one language will be mapped to one sentence in the other language
-- number of question marks (Niklas)
-- number of exclamation marks (Niklas)
-- number of commas (Niklas)
-- number of semicolons (Niklas)
-- number of colons (Niklas)
-- number of ellipsis (Niklas)
-- number of apostrophes (Niklas)
-- number of hyphens (Niklas)
-- number of quotation marks (Niklas)
-- number of slashes (Niklas)
-- number of brackets (Niklas)
-- number of special characters (Niklas)
+- number of punctuation marks (Niklas) delete real sentence ending points, cause sometimes two sentences in one language will be mapped to one sentence in the other language -> done
+- number of question marks (Niklas)-> done
+- number of exclamation marks (Niklas)-> done
+- number of commas (Niklas)-> done
+- number of semicolons (Niklas)-> done
+- number of colons (Niklas) -> done
+- number of ellipsis (Niklas) -> done
+- number of apostrophes (Niklas) -> done
+- number of hyphens (Niklas) -> done
+- number of quotation marks (Niklas)-> done
+- number of slashes (Niklas) -> done
+- number of brackets (Niklas) -> done
+- number of special characters (Niklas) -> done
 
 
 
