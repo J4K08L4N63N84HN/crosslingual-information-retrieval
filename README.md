@@ -11,7 +11,7 @@
 - total number of chars (Niklas) -> done
 - number of unique words (Niklas) -> done
 - number of stopwords (Niklas) -> done
-- sentiment analysis (Jakob)
+- sentiment analysis (Jakob) -> done
 
 ### Grammar based features
 - pos-tagger and get number of nouns, verbs, adjectives (Niklas) -> done
@@ -22,8 +22,8 @@
 - average char per word (Niklas) -> done
 - absolute difference between avg char (Niklas) -> done
 - named numbers (Niklas) -> done (included in POS Tagger NUM)
-- amount of direct translations (Jakob)
-- named entities (Jakob)
+- amount of direct translations (Jakob) -> done
+- named entities (Jakob) -> done
 
 
 ### Word embedding based features
