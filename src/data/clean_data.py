@@ -4,6 +4,7 @@ from nltk.corpus import stopwords
 
 
 def data_cleansing(df):
+    """ Function to clean the data before feature generation. """
     # tokenize the sentences
     df['English'] = df.apply(lambda x: word_tokenize(x['English']), axis=1)
     df['German'] = df.apply(lambda x: word_tokenize(x['German'], language='german'), axis=1)

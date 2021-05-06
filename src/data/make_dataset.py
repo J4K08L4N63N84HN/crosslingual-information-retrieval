@@ -1,30 +1,16 @@
-# -*- coding: utf-8 -*-
-import click
-import logging
-from pathlib import Path
-from dotenv import find_dotenv, load_dotenv
+import numpy as np
+import pandas as pd
 
 
-@click.command()
-@click.argument('input_filepath', type=click.Path(exists=True))
-@click.argument('output_filepath', type=click.Path())
-def main(input_filepath, output_filepath):
-    """ Runs data processing scripts to turn raw data from (../raw) into
-        cleaned data ready to be analyzed (saved in ../processed).
-    """
-    logger = logging.getLogger(__name__)
-    logger.info('making final data set from raw data')
+def get_sample(df, n):
+    """ Function to generate a sample set of 2n with n correct examples and n wrong examples. """
+    # get n entries with a correct translation marked with a 1 in the translation column
+    df_right = pd.concat([df.loc[0:(n - 1)], pd.DataFrame(np.ones((n, 1)), columns=['Translation'])], axis=1)
+    # get n entries with a wrong translation marked with a 0 in the translation column
+    df_wrong = pd.concat([pd.DataFrame(df.loc[n:(2 * n - 1)]['English']).reset_index(drop=True),
+                          pd.DataFrame(df.loc[(n + 1):2 * n]['German']).reset_index(drop=True)], axis=1)
+    df_wrong = pd.concat([df_wrong, pd.DataFrame(np.zeros((n, 1)), columns=['Translation'])], axis=1)
+    # combine the two tables
+    df_dataset = pd.concat([df_right, df_wrong]).reset_index(drop=True)
 
-
-if __name__ == '__main__':
-    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    logging.basicConfig(level=logging.INFO, format=log_fmt)
-
-    # not used in this stub but often useful for finding various files
-    project_dir = Path(__file__).resolve().parents[2]
-
-    # find .env automagically by walking up directories until it's found, then
-    # load up the .env entries as environment variables
-    load_dotenv(find_dotenv())
-
-    main()
+    return df_dataset
