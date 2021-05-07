@@ -15,7 +15,7 @@
 
 ### Grammar based features
 - pos-tagger and get number of nouns, verbs, adjectives (Niklas) -> done
-- verb times (Niklas)
+- verb times (Niklas) -> done
 
 ### Word based features
 - number of characters in words (Niklas) -> done
