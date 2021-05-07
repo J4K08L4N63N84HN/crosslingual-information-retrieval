@@ -5,14 +5,36 @@ import spacy
 import string
 
 
+def list_to_string(s):
+    """ Function to convert list to string. """
+    # initialize an empty string
+    str1 = " "
+    # return string
+    return str1.join(s)
+
+
 def get_pos_text(text, nlp):
     """ Function to get pos tags with spacy pending on text input and language. """
-    # use it on document
+    # use language on document
     doc = nlp(text)
     test = []
     for token in doc:
-        # get word and tag and put it as token into a list
+        # get word and tag and put it as tuple into a list
         test.append((token.text, token.pos_))
+    return test
+
+
+def get_times_text(text, nlp):
+    """ Function to get verb times with spacy pending on text input and language. """
+    # use language on document
+    doc = nlp(text)
+    test = []
+    for token in doc:
+        # check if word is a verb, since we are only interested in verb tenses
+        if token.pos_ == 'VERB':
+            # get word and tense and put it as tuple into a list, tense is delivered as List of one variable,
+            # so we convert it into a string to make handling more easy
+            test.append((token.text, list_to_string(token.morph.get('Tense'))))
     return test
 
 
@@ -33,7 +55,7 @@ def comparative_features(df, feature_name, lang_2_feature, lang_1_base_feature, 
 
 def feature_generation(df):
     """ Function to generate comparative features. """
-    # get number of punctuation marks as feature, but drop the end of senctence points
+    # get number of punctuation marks as feature, but drop the end of sentence points
     list_pm = list(string.punctuation)
     list_pm.remove('.')
     list_pm.append('...')
@@ -103,6 +125,23 @@ def feature_generation(df):
         # delete absolute columns since we only want comparative features
         del df[f'eng_{u_tag}']
         del df[f'ger_{u_tag}']
+
+    # use spacy package to get verb times
+    # we use the already loaded language packages
+    df["English_times"] = df.English_orig.apply(lambda x: get_times_text(x, nlp_en))
+    df["German_times"] = df.German_orig.apply(lambda x: get_times_text(x, nlp_de))
+    # get the different tenses and one hot encode them -> pres, past and other
+    for tense in ['Pres', 'Past', '']:
+        df[f'eng_{tense}'] = df['English_times'].apply(
+            lambda row: nltk.FreqDist(tag for (word, tag) in row if tag == tense)[tense])
+        df[f'ger_{tense}'] = df['German_times'].apply(
+            lambda row: nltk.FreqDist(tag for (word, tag) in row if tag == tense)[tense])
+        # get the difference as a feature
+        df[f'{tense}_dif'] = df[f'eng_{tense}'] - df[f'ger_{tense}']
+        # drop columns with absolute values since we only want comparative features in our model
+        df = df.drop(columns=[f'eng_{tense}', f'ger_{tense}'])
+    # change column name of '' to 'other'
+    df = df.rename(columns={'_dif': 'other_tense_dif'})
 
     # drop columns with absolute values since we only want comparative features in our model
     df = df.drop(columns=['PM_eng', 'PM_ger'])
