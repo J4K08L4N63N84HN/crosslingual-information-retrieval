@@ -4,3 +4,4 @@ nltk~=3.6.1
 setuptools~=52.0.0
 HanTa~=0.2.0
 numpy~=1.20.2
+spacy~=3.0.6
