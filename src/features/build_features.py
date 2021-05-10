@@ -1,7 +1,8 @@
 import numpy as np
 import nltk
 import spacy
-# import string library function
+from textblob import TextBlob
+from textblob_de import TextBlobDE
 import string
 
 
@@ -35,6 +36,14 @@ def get_times_text(text, nlp):
             # get word and tense and put it as tuple into a list, tense is delivered as List of one variable,
             # so we convert it into a string to make handling more easy
             test.append((token.text, list_to_string(token.morph.get('Tense'))))
+    return test
+
+
+def get_ner_text(text, nlp):
+    doc = nlp(text)
+    test = []
+    for ent in doc.ents:
+        test.append([ent.text, ent.label_])
     return test
 
 
@@ -141,7 +150,28 @@ def feature_generation(df):
         # drop columns with absolute values since we only want comparative features in our model
         df = df.drop(columns=[f'eng_{tense}', f'ger_{tense}'])
     # change column name of '' to 'other'
-    df = df.rename(columns={'_dif': 'other_tense_dif'})
+    df.rename(columns={'_dif': 'other_tense_dif'})
+
+    # use spacy package to get verb times
+    # we use the already loaded language packages
+    df["English_NER"] = df.English_orig.apply(lambda x: get_ner_text(x, nlp_en))
+    df["German_NER"] = df.German_orig.apply(lambda x: get_ner_text(x, nlp_de))
+    # get different entity names en_names = ['CARDINAL', 'DATE', 'EVENT', ' FAC', 'GPE', 'LANGUAGE', 'LAW', 'LOC',
+    # 'MONEY', 'NORP', 'ORDINAL', 'ORG', 'PERCENT', ' PERSON', 'PRODUCT', 'QUANTITY', 'TIME', 'WORK_OF_ART']
+    # müssen uns überlegen, wie wir die vergleichen möchten
+
+    # use Textblob library for sentiment analyses for english and german and compare polarity and subjectivity use the
+    # library on the english sentence
+    df["English_Blob"] = df.English_orig.apply(lambda x: TextBlob(x))
+    df["English_Polarity"] = df.English_Blob.apply(lambda x: x.sentiment.polarity)
+    df["English_Subjectivity"] = df.English_Blob.apply(lambda x: x.sentiment.subjectivity)
+    # use the library on the german sentence
+    df["German_Blob"] = df.German_orig.apply(lambda x: TextBlobDE(x))
+    df["German_Polarity"] = df.German_Blob.apply(lambda x: x.sentiment.polarity)
+    df["German_Subjectivity"] = df.German_Blob.apply(lambda x: x.sentiment.subjectivity)
+    # compare polarity and subjectivity
+    df["Polarity_difference"] = df["German_Polarity"] - df["English_Polarity"]
+    df["Subjectivity_difference"] = df["German_Subjectivity"] - df["English_Subjectivity"]
 
     # drop columns with absolute values since we only want comparative features in our model
     df = df.drop(columns=['PM_eng', 'PM_ger'])
@@ -153,5 +183,9 @@ def feature_generation(df):
     df = df.drop(columns=['char_eng', 'char_ger'])
     # drop columns with absolute values since we only want comparative features in our model
     df = df.drop(columns=['char_eng_avg', 'char_ger_avg'])
+    # drop columns with absolute values since we only want comparative features in our model
+    df = df.drop(
+        columns=["English_Blob", "English_Polarity", "English_Subjectivity", "German_Blob", "German_Polarity",
+                 "German_Subjectivity"])
 
     return df
