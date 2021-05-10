@@ -184,6 +184,8 @@ def feature_generation(df):
     # drop columns with absolute values since we only want comparative features in our model
     df = df.drop(columns=['char_eng_avg', 'char_ger_avg'])
     # drop columns with absolute values since we only want comparative features in our model
+    df = df.drop(columns=['English_times', 'German_times'])
+    # drop columns with absolute values since we only want comparative features in our model
     df = df.drop(
         columns=["English_Blob", "English_Polarity", "English_Subjectivity", "German_Blob", "German_Polarity",
                  "German_Subjectivity"])
