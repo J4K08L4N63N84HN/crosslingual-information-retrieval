@@ -33,6 +33,14 @@ import numpy as np
 from nltk.tokenize import word_tokenize
 
 
+def list_to_string(s):
+    """ Function to convert list to string. """
+    # initialize an empty string
+    str1 = " "
+    # return string
+    return str1.join(s)
+
+
 def lemmatize(sentence_vector, nlp_language):
     """ Function to lemmatize an array of tokens.
 
@@ -41,7 +49,7 @@ def lemmatize(sentence_vector, nlp_language):
             nlp_language
 
         Returns:
-            numpy.array: Array containing the total number of punctuation marks
+            numpy.array: Array containing the lemmatized words
 
         """
     lemmatizer_language = nlp_language.get_pipe("lemmatizer")
@@ -52,10 +60,10 @@ def tokenize_sentence(sentence_vector):
     """ Function to tokenize an array of sentences.
 
        Args:
-           sentence_vector (numpy.array): Array containing text
+           sentence_vector (numpy.array): Array containing text/sentences
 
        Returns:
-           numpy.array: Array containing the total number of punctuation marks
+           numpy.array: Array containing the individual tokens of the input sentence
 
        """
     return sentence_vector.apply(lambda sentence: word_tokenize(sentence))
@@ -68,7 +76,7 @@ def strip_whitespace(token_vector):
             token_vector (numpy.array): Array containing text
 
         Returns:
-            numpy.array: Array containing the total number of punctuation marks
+            numpy.array: Array containing the individual tokens of the input sentence without possible whitespaces
 
         """
     return token_vector.apply(lambda word: list(map(str.strip, word)))
@@ -78,10 +86,10 @@ def lowercase(token_vector):
     """ Function to lowercase an array of sentences.
 
         Args:
-            token_vector (numpy.array): Array containing text
+            token_vector (numpy.array): Array containing tokenized sentence
 
         Returns:
-            numpy.array: Array containing the total number of punctuation marks
+            numpy.array: Array containing tokenized, lowercased sentence
 
         """
     return token_vector.apply(lambda row: list(map(str.lower, row)))
@@ -136,6 +144,24 @@ def create_cleaned_token(sentence_vector, nlp_language, stopwords_language):
     return token_vector_preprocessed
 
 
+def create_cleaned_text(sentence_vector):
+    """ Function to create a bag of words containing tokens.
+
+    Args:
+        sentence_vector (numpy.array): Array containing text
+
+
+    Returns:
+        numpy.array: Array containing the tokes of the sentence as BoW
+
+    """
+    token_vector = tokenize_sentence(sentence_vector)
+    token_vector_whitespace = strip_whitespace(token_vector)
+    token_vector_lowercase = lowercase(token_vector_whitespace)
+
+    return token_vector_lowercase
+
+
 def number_punctuations_total(sentence_vector):
     """ Function to generate a comparison of the number of punctuation marks for two sentences.
 
@@ -158,7 +184,7 @@ def number_words(sentence_vector):
     """ Function to generate a comparison of the number of punctuation marks for two sentences.
 
        Args:
-           sentence_vector (numpy.array): Array containing textr
+           sentence_vector (numpy.array): Array containing text
 
        Returns:
            numpy.array: Array containing the total number of words
@@ -206,8 +232,8 @@ def number_characters(sentence_vector):
            numpy.array: Array containing the total number of punctuation marks
 
        """
-    sentence_vector.apply(
-        lambda sentence: len([word for word in sentence]))
+    return sentence_vector.apply(lambda sentence:
+                                 np.sum([len(word) for word in sentence if word not in string.punctuation]))
 
 
 def number_pos(sentence_vector, nlp_language, pos):
@@ -222,8 +248,7 @@ def number_pos(sentence_vector, nlp_language, pos):
            numpy.array: Array containing the total number of punctuation marks
 
        """
-    return sentence_vector.apply(
-        lambda sentence: len([token for token in nlp_language(sentence) if token.pos_ == pos]))
+    return sentence_vector.apply(lambda sentence: len([token for token in nlp_language(sentence) if token.pos_ == pos]))
 
 
 def number_times(sentence_vector, nlp_language, tense):
@@ -319,4 +344,3 @@ def sentence_embedding(token_vector, embedding_matrix_path, embedding_dictionary
 
     return token_vector.apply(lambda token_list: token_list_embedding(embedding_array_all, embedding_dictionary_all,
                                                                       token_list))
-
