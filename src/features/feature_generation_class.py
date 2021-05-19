@@ -2,13 +2,14 @@
 """
 
 import pandas as pd
+
 from src.features.sentence_based import difference_numerical, relative_difference_numerical, \
     normalized_difference_numerical
 
 
 class FeatureGeneration:
-    def __init__(self, preprocessed_parallel_dataset):
-        self.preprocessed_dataframe = preprocessed_parallel_dataset
+    def __init__(self, dataset):
+        self.preprocessed_dataset = dataset
         self.feature_dataframe = pd.DataFrame()
         self.feature_difference_list = [
             'number_punctuations_total', 'number_words',
@@ -36,10 +37,11 @@ class FeatureGeneration:
     def feature_generation(self):
         for feature in self.feature_difference_list:
             self.feature_dataframe[f"{feature}_difference"] = difference_numerical(
-                self.preprocessed_dataframe[f"{feature}_source"], self.preprocessed_dataframe[f"{feature}_target"])
+                self.preprocessed_dataset[f"{feature}_source"], self.preprocessed_dataset[f"{feature}_target"])
             self.feature_dataframe[f"{feature}_difference_relative"] = relative_difference_numerical(
-                self.preprocessed_dataframe[f"{feature}_source"], self.preprocessed_dataframe[f"{feature}_target"])
+                self.preprocessed_dataset[f"{feature}_source"], self.preprocessed_dataset[f"{feature}_target"])
             self.feature_dataframe[f"{feature}_difference_normalized"] = normalized_difference_numerical(
-                self.preprocessed_dataframe[f"{feature}_source"], self.preprocessed_dataframe[f"{feature}_target"],
-                (self.preprocessed_dataframe["number_punctuations_total_source"]+self.preprocessed_dataframe["number_words_source"]),
-                (self.preprocessed_dataframe["number_punctuations_total_target"]+self.preprocessed_dataframe["number_words_target"]))
+                self.preprocessed_dataset[f"{feature}_source"], self.preprocessed_dataset[f"{feature}_target"],
+                (self.preprocessed_dataset["number_punctuations_total_source"]+self.preprocessed_dataset["number_words_source"]),
+                (self.preprocessed_dataset["number_punctuations_total_target"]+self.preprocessed_dataset["number_words_target"]))
+        self.feature_dataframe["Translation"] = self.preprocessed_dataset["Translation"]

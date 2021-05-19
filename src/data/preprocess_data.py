@@ -324,18 +324,17 @@ def named_entities(sentence_vector, nlp_language):
         lambda sentence: [name for name in nlp_language(sentence).ents])
 
 
-def sentence_embedding(token_vector, embedding_matrix_path, embedding_dictionary_path):
+def word_embeddings(token_vector, embedding_matrix_path, embedding_dictionary_path):
     def token_list_embedding(embedding_array, embedding_dictionary, token_list):
-        embedding_sentence = np.zeros(shape=(len(token_list), 300))
+        embedding_token = np.zeros(shape=(len(token_list), 300))
         deletion_list = []
         for i in range(len(token_list)):
             if embedding_dictionary.get(token_list[i]):
-                embedding_sentence[i] = embedding_array[embedding_dictionary.get(token_list[i])]
+                embedding_token[i] = embedding_array[embedding_dictionary.get(token_list[i])]
             else:
                 deletion_list.append(i)
-        embedding_sentence = np.delete(embedding_sentence, deletion_list, axis=0)
-        embedding_sentence_mean = np.mean(embedding_sentence, axis=0)
-        return embedding_sentence_mean
+        embedding_token = np.delete(embedding_token, deletion_list, axis=0)
+        return embedding_token
 
     with open(embedding_matrix_path, 'rb') as matrix:
         embedding_array_all = np.asarray(pickle.load(matrix))
