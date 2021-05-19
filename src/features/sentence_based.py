@@ -16,15 +16,15 @@ import numpy as np
 
 
 def difference_numerical(source_array, target_array):
-    return source_array-target_array
+    return target_array-source_array
 
 
 def relative_difference_numerical(source_array, target_array):
-    return ((source_array-target_array) / source_array).replace(np.nan, 0)
+    return ((target_array-source_array) / source_array).replace(np.nan, 0)
 
 
 def normalized_difference_numerical(source_array, target_array, source_sentence_length, target_sentence_length):
-    return (target_array/source_sentence_length) - (source_array/target_sentence_length)
+    return (source_array/source_sentence_length) - (target_array/target_sentence_length)
 
 
 
