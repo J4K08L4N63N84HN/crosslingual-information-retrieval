@@ -19,12 +19,15 @@ def to_sentences(doc):
 
 
 def import_data(sentence_data_source='../data/external/europarl-v7.de-en.en',
-                sentences_data_target='../data/external/europarl-v7.de-en.de'):
+                sentences_data_target='../data/external/europarl-v7.de-en.de',
+                number_datapoints=100
+                ):
     """ Function to import the data and concatenate it into a dataframe.
 
     Args:
         sentence_data_source (numpy.array): Array containing text
         sentences_data_target
+        number_datapoints (int): Size of subset
 
     Returns:
         dataframe: Array containing the total number of punctuation marks
@@ -37,5 +40,5 @@ def import_data(sentence_data_source='../data/external/europarl-v7.de-en.en',
     sentences_target = to_sentences(doc_target)
     # create data frame with sentences
     df = pd.DataFrame({'text_source': sentences_source, 'text_target': sentences_target}, columns=['text_source',
-                                                                                                 'text_target'])
-    return df[1:100]  # reduce number for testing code
+                                                                                                   'text_target'])
+    return df.sample(number_datapoints)  # reduce number for testing code
