@@ -35,6 +35,16 @@ class FeatureGeneration:
             'number_stopwords']
 
     def feature_generation(self):
+        """ Function to generate the features of the preprocessed array
+
+                 Args:
+
+
+                 Returns:
+                     dataframe: dataframe containing the feature columns
+
+                           """
+
         for feature in self.feature_difference_list:
             self.feature_dataframe[f"{feature}_difference"] = difference_numerical(
                 self.preprocessed_dataset[f"{feature}_source"], self.preprocessed_dataset[f"{feature}_target"])

@@ -33,14 +33,6 @@ import numpy as np
 from nltk.tokenize import word_tokenize
 
 
-def list_to_string(s):
-    """ Function to convert list to string. """
-    # initialize an empty string
-    str1 = " "
-    # return string
-    return str1.join(s)
-
-
 def lemmatize(sentence_vector, nlp_language):
     """ Function to lemmatize an array of tokens.
 
@@ -96,42 +88,41 @@ def lowercase(token_vector):
 
 
 def remove_punctuation(token_vector):
-    """ Function to lowercase an array of sentences.
+    """ Function to remove punctuation out of an array of sentences
 
         Args:
-            token_vector (numpy.array): Array containing text
+            token_vector (numpy.array): Array containing tokenized, lowercased sentence
 
         Returns:
-            numpy.array: Array containing the total number of punctuation marks
+            numpy.array: Array containing tokenized sentence removed punctuation
 
         """
     return token_vector.apply(lambda sentence: [word for word in sentence if word not in string.punctuation])
 
 
 def remove_stopwords(token_vector, stopwords_language):
-    """ Function to lowercase an array of sentences.
+    """ Function to remove stopwords out of an array of sentences
 
         Args:
             token_vector (numpy.array): Array containing text
             stopwords_language (list): List of stopwords in a specific language
 
         Returns:
-            numpy.array: Array containing the total number of punctuation marks
-
+            numpy.array: Array containing tokenized sentence removed stopwords
         """
     return token_vector.apply(lambda sentence: [word for word in sentence if word not in stopwords_language])
 
 
 def create_cleaned_token(sentence_vector, nlp_language, stopwords_language):
-    """ Function to lemmatize an array of tokens.
+    """ Function combine cleaning function for embedding-based features
 
     Args:
         sentence_vector (numpy.array): Array containing text
-        nlp_language
+        nlp_language -> spacy package function to tag words
         stopwords_language
 
     Returns:
-        numpy.array: Array containing the total number of punctuation marks
+        numpy.array: Cleaned array as BoW
 
     """
     sentence_vector_lemmatized = lemmatize(sentence_vector, nlp_language)
@@ -145,14 +136,14 @@ def create_cleaned_token(sentence_vector, nlp_language, stopwords_language):
 
 
 def create_cleaned_text(sentence_vector):
-    """ Function to create a bag of words containing tokens.
+    """ Function combine cleaning function for text-based features
 
     Args:
         sentence_vector (numpy.array): Array containing text
 
 
     Returns:
-        numpy.array: Array containing the tokes of the sentence as BoW
+        numpy.array: Cleaned array as BoW
 
     """
     token_vector = tokenize_sentence(sentence_vector)
@@ -163,17 +154,19 @@ def create_cleaned_text(sentence_vector):
 
 
 def number_punctuations_total(sentence_vector):
-    """ Function to generate a comparison of the number of punctuation marks for two sentences.
+    """ Function to generate the number of all punctuation marks in a given vector of BoW-Sentences.
 
        Args:
-           sentence_vector (numpy.array): Array containing text
+           sentence_vector (numpy.array): BoW array
 
        Returns:
            numpy.array: Array containing the total number of punctuation marks
 
        """
+    # get the list of punctuation marks from the string package
     list_pm = list(string.punctuation)
-    # Drop the end of sentence points, since it is not an differentiator between two sentences.
+    # Drop the end of sentence points, since it is not an differentiator between two sentences. And the data set may
+    # translate two sentences or more into one.
     list_pm.remove('.')
     list_pm.append('...')
 
@@ -181,10 +174,10 @@ def number_punctuations_total(sentence_vector):
 
 
 def number_words(sentence_vector):
-    """ Function to generate a comparison of the number of punctuation marks for two sentences.
+    """ Function to generate the number of words in a given vector of BoW-Sentences.
 
        Args:
-           sentence_vector (numpy.array): Array containing text
+           sentence_vector (numpy.array): BoW array
 
        Returns:
            numpy.array: Array containing the total number of words
@@ -195,10 +188,10 @@ def number_words(sentence_vector):
 
 
 def number_unique_words(sentence_vector):
-    """ Function to generate a comparison of the number of punctuation marks for two sentences.
+    """ Function to generate the number of unique words in a given vector of BoW-Sentences.
 
        Args:
-           sentence_vector (numpy.array): Array containing text
+           sentence_vector (numpy.array): BoW array
 
        Returns:
            numpy.array: Array containing the total number of unique words
@@ -209,10 +202,10 @@ def number_unique_words(sentence_vector):
 
 
 def number_punctuation_marks(sentence_vector, punctuation_mark):
-    """ Function to generate a comparison of the number of punctuation marks for two sentences.
+    """ Function to generate the number of a given punctuation mark in a given vector of BoW-Sentences.
 
        Args:
-           sentence_vector (numpy.array): Array containing text
+           sentence_vector (numpy.array): BoW array
            punctuation_mark (str): Punctuation mark of interest
 
        Returns:
@@ -223,13 +216,13 @@ def number_punctuation_marks(sentence_vector, punctuation_mark):
 
 
 def number_characters(sentence_vector):
-    """ Function to generate a comparison of the number of punctuation marks for two sentences.
+    """ Function to generate the number of characters in a given vector of BoW-Sentences.
 
        Args:
-           sentence_vector (numpy.array): Array containing text
+           sentence_vector (numpy.array): BoW array
 
        Returns:
-           numpy.array: Array containing the total number of punctuation marks
+           numpy.array: Array containing the total number of characters
 
        """
     return sentence_vector.apply(lambda sentence:
@@ -237,30 +230,30 @@ def number_characters(sentence_vector):
 
 
 def number_pos(sentence_vector, nlp_language, pos):
-    """ Function to generate a comparison of the number of punctuation marks for two sentences.
+    """ Function to generate the number of a given part-of-speech tag in a given vector of BoW-Sentences.
 
        Args:
-           sentence_vector (numpy.array): Array containing text
+           sentence_vector (numpy.array): BoW array
            nlp_language (str): Language of the array
-           pos
+           pos: a given part-of-speech tag
 
        Returns:
-           numpy.array: Array containing the total number of punctuation marks
+           numpy.array: Array containing the total number of a given part-of-speech tag
 
        """
     return sentence_vector.apply(lambda sentence: len([token for token in nlp_language(sentence) if token.pos_ == pos]))
 
 
 def number_times(sentence_vector, nlp_language, tense):
-    """ Function to create number of times.
+    """ Function to generate the number of a given tense verb tag in a given vector of BoW-Sentences.
 
     Args:
-           sentence_vector (numpy.array): Array containing text
+           sentence_vector (numpy.array): BoW array
            nlp_language (str): Language of the array
-           tense
+           tense: a given verb tense tag
 
     Returns:
-           numpy.array: Array containing the total number of punctuation marks
+           numpy.array: Array containing the total number of verbs in a given tense
 
     """
     return sentence_vector.apply(lambda sentence: len([token for token in nlp_language(sentence) if token.morph.get(
@@ -268,56 +261,56 @@ def number_times(sentence_vector, nlp_language, tense):
 
 
 def polarity(sentence_vector, textblob_language):
-    """ Function to generate a comparison of the number of punctuation marks for two sentences.
+    """ Function to generate the polarity in a given vector of BoW-sentences
 
        Args:
-           sentence_vector (numpy.array): Array containing text
+           sentence_vector (numpy.array): BoW array
            textblob_language (str): Language of the array
 
        Returns:
-           numpy.array: Array containing the total number of punctuation marks
+           numpy.array: Array containing the polarity (sentiment analyses)
 
        """
     return sentence_vector.apply(lambda sentence: textblob_language(sentence).sentiment.polarity)
 
 
 def subjectivity(sentence_vector, textblob_language):
-    """ Function to generate a comparison of the number of punctuation marks for two sentences.
+    """ Function to generate the subjectivity in a given vector of BoW-sentences
 
         Args:
-            sentence_vector (numpy.array): Array containing text
+            sentence_vector (numpy.array): BoW array
             textblob_language (str): Language of the array
 
         Returns:
-            numpy.array: Array containing the total number of punctuation marks
+            numpy.array: Array containing the subjectivity (sentiment analyses)
 
         """
     return sentence_vector.apply(lambda sentence: textblob_language(sentence).sentiment.subjectivity)
 
 
 def number_stopwords(sentence_vector, stopwords_language):
-    """ Function to generate a comparison of the number of punctuation marks for two sentences.
+    """ Function to generate the number of stopwords in a given vector of BoW-Sentences.
 
         Args:
-            sentence_vector (numpy.array): Array containing text
-            stopwords_language (str): Language of the array
+            sentence_vector (numpy.array): BoW array
+            stopwords_language (str): Stopwords in the language of the array
 
         Returns:
-            numpy.array: Array containing the total number of punctuation marks
+            numpy.array: Array containing the total number of stopwords in a given language
 
         """
     return sentence_vector.apply(lambda sentence: len([word for word in sentence if word in stopwords_language]))
 
 
 def named_entities(sentence_vector, nlp_language):
-    """ Function to generate a comparison of the number of punctuation marks for two sentences.
+    """ unction to generate the subjectivity in a given vector of BoW-sentences
 
         Args:
-            sentence_vector (numpy.array): Array containing text
+            sentence_vector (numpy.array): BoW array
             nlp_language (str): Language of the array
 
         Returns:
-            numpy.array: Array containing the total number of punctuation marks
+            numpy.array: Array containing the total number of named entities in a given language
 
         """
     return sentence_vector.apply(

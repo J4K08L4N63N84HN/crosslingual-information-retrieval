@@ -26,11 +26,11 @@ def import_data(sentence_data_source='../data/external/europarl-v7.de-en.en',
 
     Args:
         sentence_data_source (numpy.array): Array containing text
-        sentences_data_target
+        sentences_data_target (numpy.array): Array containing text
         number_datapoints (int): Size of subset
 
     Returns:
-        dataframe: Array containing the total number of punctuation marks
+        dataframe with source and target language sentences
 
     """
     doc_source = load_doc(sentence_data_source)

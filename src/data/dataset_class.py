@@ -10,7 +10,16 @@ class DataSet:
         self.dataset = pd.DataFrame
 
     def get_sample(self, n):
-        """ Method to generate a sample set of 2n with n correct examples and n wrong examples. """
+        """ Method to generate a sample set of 2n with n correct examples and n wrong examples.
+
+               Args:
+                   amount n (integer)
+
+               Returns:
+                   dataframe: sample of 2n
+
+               """
+
         random_sample_right = self.preprocessed_dataframe.sample(n).reset_index(drop=True)
         random_sample_wrong = pd.concat([self.preprocessed_source.sample(n).reset_index(drop=True),
                                          self.preprocessed_target.sample(n).reset_index(drop=True)],
