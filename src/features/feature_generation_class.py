@@ -2,7 +2,8 @@
 """
 
 import pandas as pd
-from src.features.sentence_based import difference_numerical
+from src.features.sentence_based import difference_numerical, relative_difference_numerical, \
+    normalized_difference_numerical
 
 
 class FeatureGeneration:
@@ -36,8 +37,9 @@ class FeatureGeneration:
         for feature in self.feature_difference_list:
             self.feature_dataframe[f"{feature}_difference"] = difference_numerical(
                 self.preprocessed_dataframe[f"{feature}_source"], self.preprocessed_dataframe[f"{feature}_target"])
-            self.feature_dataframe[f"{feature}_difference_relative"] = difference_numerical(
+            self.feature_dataframe[f"{feature}_difference_relative"] = relative_difference_numerical(
                 self.preprocessed_dataframe[f"{feature}_source"], self.preprocessed_dataframe[f"{feature}_target"])
-            self.feature_dataframe[f"{feature}_difference_normalized"] = difference_numerical(
+            self.feature_dataframe[f"{feature}_difference_normalized"] = normalized_difference_numerical(
                 self.preprocessed_dataframe[f"{feature}_source"], self.preprocessed_dataframe[f"{feature}_target"],
-                self.preprocessed_dataframe["number_characters_source"], self.preprocessed_dataframe["number_characters_target"])
+                self.preprocessed_dataframe["number_characters_source"],
+                self.preprocessed_dataframe["number_characters_target"])
