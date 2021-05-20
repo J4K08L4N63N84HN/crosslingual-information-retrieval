@@ -8,7 +8,7 @@ import pandas as pd
 from src.data.import_data import import_data
 from src.data.preprocess_data import create_cleaned_token, create_cleaned_text, number_punctuations_total, number_words, \
     number_unique_words, number_punctuation_marks, number_characters, number_pos, number_times, polarity, subjectivity, \
-    number_stopwords, named_entities, word_embeddings, remove_stopwords
+    number_stopwords, named_entities, word_embeddings, remove_stopwords, average_characters
 
 
 class PreprocessingEuroParl:
@@ -38,6 +38,8 @@ class PreprocessingEuroParl:
         self.preprocessed_source["number_words_source"] = number_words(self.dataframe["text_source_1"])
         self.preprocessed_source["number_unique_words_source"] = number_unique_words(self.dataframe["text_source_1"])
         self.preprocessed_source["number_characters_source"] = number_characters(self.dataframe["text_source_1"])
+        self.preprocessed_source["characters_avg_source"] = average_characters(self.preprocessed_source["number_characters_source"],
+                                                                               self.preprocessed_source["number_words_source"])
         for punctuation_mark in self.punctuation_list:
             self.preprocessed_source[f"number_{punctuation_mark}_source"] = number_punctuation_marks(self.dataframe[
                                                                                                          "text_source_1"],
@@ -83,6 +85,8 @@ class PreprocessingEuroParl:
         self.preprocessed_target["number_words_target"] = number_words(self.dataframe["text_target_1"])
         self.preprocessed_target["number_unique_words_target"] = number_unique_words(self.dataframe["text_target_1"])
         self.preprocessed_target["number_characters_target"] = number_characters(self.dataframe["text_target_1"])
+        self.preprocessed_target["characters_avg_target"] = average_characters(self.preprocessed_target["number_characters_target"],
+                                                                               self.preprocessed_target["number_words_target"])
         for punctuation_mark in self.punctuation_list:
             self.preprocessed_target[f"number_{punctuation_mark}_target"] = number_punctuation_marks(self.dataframe[
                                                                                                          "text_target_1"],

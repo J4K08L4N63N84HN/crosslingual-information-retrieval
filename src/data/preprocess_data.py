@@ -229,6 +229,20 @@ def number_characters(sentence_vector):
                                  np.sum([len(word) for word in sentence if word not in string.punctuation]))
 
 
+def average_characters(character_vector, word_vector):
+    """ Function to generate the number of characters per word in a given vector of BoW-Sentences.
+
+       Args:
+           character_vector (numpy.array): array containing the amount of characters
+           word_vector (numpy.array): array containing the amount of words
+
+       Returns:
+           numpy.array: Array containing the average amount of characters per word
+
+       """
+    return character_vector/word_vector
+
+
 def number_pos(sentence_vector, nlp_language, pos):
     """ Function to generate the number of a given part-of-speech tag in a given vector of BoW-Sentences.
 
