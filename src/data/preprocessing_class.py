@@ -11,10 +11,30 @@ from src.data.preprocess_data import create_cleaned_token, create_cleaned_text, 
     number_stopwords, named_entities, word_embeddings, remove_stopwords, average_characters
 
 
+
 class PreprocessingEuroParl:
+    """ Class for preprocessing the EuroParl datasets for two languages.
+
+    Attributes:
+        dataframe (dataframe): Parallel sentences of the europarl dataset
+        punctuation_list (list): Punctuation list for removal and counting
+        pos_list (list): Part of speech tags list for counting
+        tense_list (list): Tense list for counting
+        preprocessed_source (dataframe): Preprocessed dataframe for source sentences
+        preprocessed_target (dataframe): Preprocessed dataframe for target sentences
+        preprocessed_dataframe (dataframe): Merged dataframe from source and target
+    """
+
     def __init__(self, sentence_data_source='../../data/external/europarl-v7.de-en.en',
                  sentence_data_target='../../data/external/europarl-v7.de-en.de',
                  number_datapoints=100):
+        """ Initialize dataframe by importing europarl data for source and target
+
+        Args:
+            sentence_data_source (str): Path of the europarl source dataset
+            sentence_data_target (str): Path of the europarl target dataset
+            number_datapoints (int): Size of the sample of the europarl dataset
+        """
         self.dataframe = import_data(sentence_data_source, sentence_data_target, number_datapoints)
         self.punctuation_list = list(string.punctuation)
         self.pos_list = ['ADJ', 'ADP', 'ADV', 'AUX', 'CONJ', 'CCONJ', 'DET', 'INTJ', 'NOUN', 'NUM', 'PRT', 'PRON',
@@ -26,6 +46,15 @@ class PreprocessingEuroParl:
 
     def preprocess_sentences_source(self, stopwords_source, nlp_source, textblob_source, embedding_matrix_source,
                                     embedding_dictionary_source):
+        """ Preprocess the source sentence dataset
+
+        Args:
+            stopwords_source (list): List of stopwords to remove and count
+            nlp_source (spacy pipeline): Spacy pipeline for preprocessing
+            textblob_source (textblob object): Textblob object for sentiment analysis
+            embedding_matrix_source (str): Path to embedding matrix
+            embedding_dictionary_source (str): Path to embedding dictionary
+        """
         self.dataframe["token_preprocessed_source"] = create_cleaned_token((self.dataframe["text_source"]),
                                                                            nlp_source, stopwords_source)
         self.dataframe["text_source_1"] = create_cleaned_text(self.dataframe["text_source"])
@@ -74,6 +103,15 @@ class PreprocessingEuroParl:
 
     def preprocess_sentences_target(self, stopwords_target, nlp_target, textblob_target, embedding_matrix_target,
                                     embedding_dictionary_target):
+        """ Preprocess the target sentence dataset
+
+        Args:
+            stopwords_target (list): List of stopwords to remove and count
+            nlp_target (spacy pipeline): Spacy pipeline for preprocessing
+            textblob_target (textblob object): Textblob object for sentiment analysis
+            embedding_matrix_target (str): Path to embedding matrix
+            embedding_dictionary_target (str): Path to embedding dictionary
+        """
         self.dataframe["token_preprocessed_target"] = create_cleaned_token((self.dataframe["text_target"]),
                                                                            nlp_target, stopwords_target)
         self.dataframe["text_target_1"] = create_cleaned_text(self.dataframe["text_target"])
@@ -119,8 +157,12 @@ class PreprocessingEuroParl:
             embedding_matrix_target, embedding_dictionary_target)
 
     def combine_source_target(self):
+        """ Combine preprocessed source and target sentences in one dataframe
+        """
         self.preprocessed_dataframe = pd.concat([self.preprocessed_source, self.preprocessed_target], axis=1)
 
     def add_label(self):
+        """ Add translation label to the dataframe
+        """
         self.preprocessed_dataframe["Translation"] = np.ones((int(self.preprocessed_dataframe.shape[0]), 1),
                                                              dtype=np.int8)

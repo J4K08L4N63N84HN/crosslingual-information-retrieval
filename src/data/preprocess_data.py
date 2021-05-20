@@ -332,7 +332,20 @@ def named_entities(sentence_vector, nlp_language):
 
 
 def word_embeddings(token_vector, embedding_matrix_path, embedding_dictionary_path):
+    """ Function to create embeddings for the preprocessed words.
+
+       Args:
+           token_vector (numpy.array): Array containing text
+           embedding_matrix_path (str): Path to the embedding matrix
+           embedding_dictionary_path (str): Path to the embedding dictionary
+
+       Returns:
+           numpy.array: Array containing arrays of the embeddings
+
+       """
     def token_list_embedding(embedding_array, embedding_dictionary, token_list):
+        """ Function to retrieve the embeddings from the matrix
+        """
         embedding_token = np.zeros(shape=(len(token_list), 300))
         deletion_list = []
         for i in range(len(token_list)):

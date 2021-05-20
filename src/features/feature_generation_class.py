@@ -8,7 +8,19 @@ from src.features.sentence_based import difference_numerical, relative_differenc
 
 
 class FeatureGeneration:
+    """ Class for generating features from preprocessed parallel sentences.
+
+    Attributes:
+        preprocessed_dataset (dataframe): Preprocessed dataset
+        feature_dataframe (dataframe): Dataset containing feature for training a model
+        feature_difference_list (list): List of preprocessed columns that should be compared
+    """
     def __init__(self, dataset):
+        """ Initialize dataframe by importing europarl data for source and target
+
+        Args:
+            dataset (str): Path of the europarl source dataset
+        """
         self.preprocessed_dataset = dataset
         self.feature_dataframe = pd.DataFrame()
         self.feature_difference_list = [
@@ -36,16 +48,8 @@ class FeatureGeneration:
             'number_stopwords']
 
     def feature_generation(self):
-        """ Function to generate the features of the preprocessed array
-
-                 Args:
-
-
-                 Returns:
-                     dataframe: dataframe containing the feature columns
-
-                           """
-
+        """ Create comparative features of preprocessed columns.
+        """
         for feature in self.feature_difference_list:
             self.feature_dataframe[f"{feature}_difference"] = difference_numerical(
                 self.preprocessed_dataset[f"{feature}_source"], self.preprocessed_dataset[f"{feature}_target"])
