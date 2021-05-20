@@ -24,7 +24,8 @@ class FeatureGeneration:
             "number_\\", "number_]", "number_^",
             'number__', 'number_`', 'number_{',
             'number_|', 'number_}', 'number_~',
-            'number_characters', 'number_ADJ', 'number_ADP',
+            'number_characters', 'characters_avg',
+            'number_ADJ', 'number_ADP',
             'number_ADV', 'number_AUX', 'number_CONJ',
             'number_CCONJ', 'number_DET', 'number_INTJ',
             'number_NOUN', 'number_NUM', 'number_PRT',
@@ -52,6 +53,8 @@ class FeatureGeneration:
                 self.preprocessed_dataset[f"{feature}_source"], self.preprocessed_dataset[f"{feature}_target"])
             self.feature_dataframe[f"{feature}_difference_normalized"] = normalized_difference_numerical(
                 self.preprocessed_dataset[f"{feature}_source"], self.preprocessed_dataset[f"{feature}_target"],
-                (self.preprocessed_dataset["number_punctuations_total_source"]+self.preprocessed_dataset["number_words_source"]),
-                (self.preprocessed_dataset["number_punctuations_total_target"]+self.preprocessed_dataset["number_words_target"]))
+                (self.preprocessed_dataset["number_punctuations_total_source"] + self.preprocessed_dataset[
+                    "number_words_source"]),
+                (self.preprocessed_dataset["number_punctuations_total_target"] + self.preprocessed_dataset[
+                    "number_words_target"]))
         self.feature_dataframe["Translation"] = self.preprocessed_dataset["Translation"]
