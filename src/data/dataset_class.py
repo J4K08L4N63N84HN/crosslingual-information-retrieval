@@ -53,7 +53,8 @@ class DataSet:
         independent testset of 1000 queries and 10.000 documents as a crossjoin.
 
                Args:
-                   n (int): amount
+
+              n (int): Number of correct and incorrect sentence pairs
 
                """
         # create query and document frames
@@ -75,9 +76,7 @@ class DataSet:
         self.preprocessed_dataframe.drop(self.preprocessed_dataframe.index[:10000], inplace=True)
         self.preprocessed_source.drop(self.preprocessed_source.index[:10000], inplace=True)
         self.preprocessed_target.drop(self.preprocessed_target.index[:10000], inplace=True)
-          Args:
-              n (int): Number of correct and incorrect sentence pairs
-          """
+
         random_sample_right = self.preprocessed_dataframe.sample(n).reset_index(drop=True)
         random_sample_wrong = pd.concat([self.preprocessed_source.sample(n).reset_index(drop=True),
                                          self.preprocessed_target.sample(n).reset_index(drop=True)],
