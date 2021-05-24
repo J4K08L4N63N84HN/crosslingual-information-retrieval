@@ -49,8 +49,32 @@ class DataSet:
             'number_stopwords']
 
     def get_sample(self, n):
-        """ Method to generate a sample set of 2n with n correct examples and n wrong examples
+        """ Method to generate a training set of 2n with n correct examples and n wrong examples and a
+        independent testset of 1000 queries and 10.000 documents as a crossjoin.
 
+               Args:
+                   n (int): amount
+
+               """
+        # create query and document frames
+        for feature in self.feature_list:
+            self.query[f"{feature}_source"] = self.preprocessed_dataframe[f"{feature}_source"]
+            self.documents[f"{feature}_target"] = self.preprocessed_dataframe[f"{feature}_target"]
+        self.query = self.query.iloc[:1000]
+        self.documents = self.documents.iloc[:10000]
+        # generate a cross set of the queries and documents
+        self.testset = self.query.reset_index().merge(self.documents.reset_index(), how='cross')
+        # label with 1 if its right translation and 0 for the wrong translation
+        for index_label, row_series in self.testset.iterrows():
+            if self.testset.at[index_label, 'index_x'] == self.testset.at[index_label, 'index_y']:
+                self.testset.at[index_label, 'Translation'] = 1
+            else:
+                self.testset.at[index_label, 'Translation'] = 0
+        self.testset.drop(columns=['index_x', 'index_y'], inplace=True)
+        # drop first 10.000 documents from train set to make sure that its independent
+        self.preprocessed_dataframe.drop(self.preprocessed_dataframe.index[:10000], inplace=True)
+        self.preprocessed_source.drop(self.preprocessed_source.index[:10000], inplace=True)
+        self.preprocessed_target.drop(self.preprocessed_target.index[:10000], inplace=True)
           Args:
               n (int): Number of correct and incorrect sentence pairs
           """
