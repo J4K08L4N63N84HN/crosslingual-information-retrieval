@@ -16,7 +16,8 @@
 - Number of Stopwords
 - Sentiment Analysis
 
-TODO: Add Translation of Words
+TODO: ADD TF-IDF weighted sentence embedding + pca
+TODO: ADD averaged sentence embedding + pca
 
 Possible next steps:
 - Apply spelling correction
@@ -30,7 +31,9 @@ import pickle
 import string
 
 import numpy as np
+import pandas as pd
 from nltk.tokenize import word_tokenize
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def lemmatize(sentence_vector, nlp_language):
@@ -97,7 +100,8 @@ def remove_punctuation(token_vector):
             numpy.array: Array containing tokenized sentence removed punctuation
 
         """
-    return token_vector.apply(lambda sentence: [word for word in sentence if word not in string.punctuation])
+    punctuations = string.punctuation + "’"
+    return token_vector.apply(lambda sentence: [word for word in sentence if word not in punctuations])
 
 
 def remove_stopwords(token_vector, stopwords_language):
@@ -113,7 +117,21 @@ def remove_stopwords(token_vector, stopwords_language):
     return token_vector.apply(lambda sentence: [word for word in sentence if word not in stopwords_language])
 
 
-def create_cleaned_token(sentence_vector, nlp_language, stopwords_language):
+def remove_numbers(token_vector):
+    """ Function to remove numbers out of an array of sentences
+
+        Args:
+            token_vector (numpy.array): Array containing tokenized, lowercased sentence
+
+        Returns:
+            numpy.array: Array containing tokenized sentence removed numbers
+
+        """
+    translation_table = str.maketrans('', '', string.digits)
+    return token_vector.apply(lambda sentence: [word.translate(translation_table) for word in sentence])
+
+
+def create_cleaned_token_embedding(sentence_vector, nlp_language, stopwords_language):
     """ Function combine cleaning function for embedding-based features
 
     Args:
@@ -130,7 +148,8 @@ def create_cleaned_token(sentence_vector, nlp_language, stopwords_language):
     token_vector_whitespace = strip_whitespace(token_vector)
     token_vector_lowercase = lowercase(token_vector_whitespace)
     token_vector_punctuation = remove_punctuation(token_vector_lowercase)
-    token_vector_preprocessed = remove_stopwords(token_vector_punctuation, stopwords_language)
+    token_vector_stopwords = remove_stopwords(token_vector_punctuation, stopwords_language)
+    token_vector_preprocessed = remove_numbers(token_vector_stopwords)
 
     return token_vector_preprocessed
 
@@ -240,7 +259,7 @@ def average_characters(character_vector, word_vector):
            numpy.array: Array containing the average amount of characters per word
 
        """
-    return character_vector/word_vector
+    return character_vector / word_vector
 
 
 def number_pos(sentence_vector, nlp_language, pos):
@@ -331,35 +350,127 @@ def named_entities(sentence_vector, nlp_language):
         lambda sentence: [name for name in nlp_language(sentence).ents])
 
 
-def word_embeddings(token_vector, embedding_matrix_path, embedding_dictionary_path):
+def load_embeddings(embedding_matrix_path='../data/interim/proc_b_src_emb.p',
+                    embedding_dictionary_path='../data/interim/proc_b_src_word.p'):
+    with open(embedding_matrix_path, 'rb') as fp:
+        embedding_matrix = pickle.load(fp)
+    with open(embedding_dictionary_path, 'rb') as fp:
+        embedding_dictionary = pickle.load(fp)
+
+    def normalize_matrix(matrix):
+        norms = np.sqrt(np.sum(np.square(matrix), axis=1))
+        norms[norms == 0] = 1
+        norms = norms.reshape(-1, 1)
+        matrix /= norms[:]
+        return matrix
+
+    embedding_matrix_normalized = normalize_matrix(embedding_matrix)
+
+    return embedding_matrix_normalized, embedding_dictionary
+
+
+def word_embeddings(token_vector, embedding_array, embedding_dictionary):
     """ Function to create embeddings for the preprocessed words.
 
        Args:
            token_vector (numpy.array): Array containing text
-           embedding_matrix_path (str): Path to the embedding matrix
-           embedding_dictionary_path (str): Path to the embedding dictionary
+           embedding_array (array): Path to the embedding matrix
+           embedding_dictionary (dictionary): Path to the embedding dictionary
 
        Returns:
-           numpy.array: Array containing arrays of the embeddings
+           pandas.Dataframe: Array containing arrays of the embeddings
 
        """
+
     def token_list_embedding(embedding_array, embedding_dictionary, token_list):
         """ Function to retrieve the embeddings from the matrix
         """
-        embedding_token = np.zeros(shape=(len(token_list), 300))
-        deletion_list = []
+        dictionary = {}
         for i in range(len(token_list)):
             if embedding_dictionary.get(token_list[i]):
-                embedding_token[i] = embedding_array[embedding_dictionary.get(token_list[i])]
-            else:
-                deletion_list.append(i)
-        embedding_token = np.delete(embedding_token, deletion_list, axis=0)
-        return embedding_token
+                dictionary[token_list[i]] = embedding_array[embedding_dictionary.get(token_list[i])].tolist()[0]
+        embedding_dataframe = pd.DataFrame(dictionary)
+        return embedding_dataframe
 
-    with open(embedding_matrix_path, 'rb') as matrix:
-        embedding_array_all = np.asarray(pickle.load(matrix))
-    with open(embedding_dictionary_path, 'rb') as dictionary:
-        embedding_dictionary_all = pickle.load(dictionary)
-
-    return token_vector.apply(lambda token_list: token_list_embedding(embedding_array_all, embedding_dictionary_all,
+    return token_vector.apply(lambda token_list: token_list_embedding(embedding_array, embedding_dictionary,
                                                                       token_list))
+
+
+def translate_words(token_vector, embedding_dictionary_source, embedding_array_normalized_source,
+                    embedding_dictionary_target, embedding_array_normalized_target, n_neighbors):
+    def calculate_translations(word_list, embedding_dictionary_source, embedding_array_normalized_source,
+                               embedding_dictionary_target, embedding_array_normalized_target, n_neighbors):
+        translation_list = []
+        for word in word_list:
+
+            try:
+                given_source_index = embedding_dictionary_source[word]
+            except KeyError:
+                continue
+
+            # Calculate Cos Similarity
+            norm_src_word_emb = embedding_array_normalized_source[given_source_index]
+            similarity_cos = np.dot(norm_src_word_emb, np.transpose(embedding_array_normalized_target))
+
+            # Find Closest Neighbors
+            most_similar_trg_index = np.argsort(-similarity_cos[[0]])[:n_neighbors].tolist()[0][:n_neighbors]
+
+            inverse_trg_word = {index: word for word, index in embedding_dictionary_target.items()}
+            for single_neighbor in most_similar_trg_index:
+                translation_list.append(inverse_trg_word[single_neighbor])
+        return translation_list
+
+    return token_vector.apply(lambda token_list: calculate_translations(token_list, embedding_dictionary_source,
+                                                                        embedding_array_normalized_source,
+                                                                        embedding_dictionary_target,
+                                                                        embedding_array_normalized_target, n_neighbors))
+
+
+def sentence_embedding_average(embedding_token_vector):
+    """ Function to create average sentence embedding
+       Args:
+           embedding_token_vector (numpy.array): Array containing embedding matrix of the token
+
+       Returns:
+           numpy.array: Array containing average of the embeddings
+       """
+    return embedding_token_vector.apply(lambda embedding_token: [embedding_token.mean(axis=1)])
+
+
+def tf_idf_vector(token_vector):
+    def identity_tokenizer(text):
+        return text
+
+    vectorizer = TfidfVectorizer(tokenizer=identity_tokenizer, lowercase=False)
+    vectors = vectorizer.fit_transform(token_vector)
+    feature_names = vectorizer.get_feature_names()
+    dense = vectors.todense()
+    denselist = dense.tolist()
+    df_tf_idf = pd.DataFrame(denselist, columns=feature_names)
+    return df_tf_idf.to_dict(orient='records')
+
+
+def sentence_embedding_tf_idf(embedding_array_dataframe, tf_idf_dict_vec):
+    """ Function to create tf-idf weighted sentence embedding
+
+        Args:
+            token_vector (numpy.array): Array containing text
+            embedding_array (array): Path to the embedding matrix
+            embedding_dictionary (dictionary): Path to the embedding dictionary
+
+        Returns:
+            numpy.array: Array containing tf-idf weighted embedding
+        """
+    df = pd.DataFrame()
+    df['embedding_array_vec'] = embedding_array_dataframe
+    df['tf_idf_dict_vec'] = tf_idf_dict_vec
+
+    def aggregate_tf_idf_embedding(embedding_dataframe, tf_idf_dict):
+        for i in range(embedding_dataframe.shape[1]):
+            embedding_dataframe[embedding_dataframe.columns[i]] = embedding_dataframe[embedding_dataframe.columns[i]] * \
+                                                                  tf_idf_dict[embedding_dataframe.columns[i]]
+        return [embedding_dataframe.values.mean(axis=1)]
+
+    weighted_average = df.apply(lambda x: aggregate_tf_idf_embedding(x.embedding_array_vec, x.tf_idf_dict_vec), axis=1)
+
+    return weighted_average
