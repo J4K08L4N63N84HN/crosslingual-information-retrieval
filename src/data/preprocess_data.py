@@ -259,7 +259,7 @@ def average_characters(character_vector, word_vector):
            numpy.array: Array containing the average amount of characters per word
 
        """
-    return character_vector / word_vector
+    return (character_vector / word_vector).replace(np.nan, 0).replace(np.inf, 0).replace(np.log(0), 0)
 
 
 def number_pos(sentence_vector, nlp_language, pos):
