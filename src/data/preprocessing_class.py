@@ -165,14 +165,14 @@ class PreprocessingEuroParl:
             embedding_matrix_normalized_target,
             embedding_dictionary_target)
 
-        self.preprocessed["source_translated_to_target"] = translate_words(
+        self.preprocessed["translated_to_target_source"] = translate_words(
             self.dataframe["token_preprocessed_embedding_source"],
             embedding_dictionary_source,
             embedding_matrix_normalized_target,
             embedding_dictionary_target,
             embedding_matrix_normalized_target,
             n_neighbors)
-        self.preprocessed["target_translated_to_source"] = translate_words(
+        self.preprocessed["translated_to_source_target"] = translate_words(
             self.dataframe["token_preprocessed_embedding_target"],
             embedding_dictionary_source,
             embedding_matrix_normalized_target,
