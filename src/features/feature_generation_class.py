@@ -3,6 +3,7 @@
 
 import pandas as pd
 
+from src.features.embed_based import cosine_similarity_vector, jaccard
 from src.features.sentence_based import difference_numerical, relative_difference_numerical, \
     normalized_difference_numerical
 
@@ -15,6 +16,7 @@ class FeatureGeneration:
         feature_dataframe (dataframe): Dataset containing feature for training a model
         feature_difference_list (list): List of preprocessed columns that should be compared
     """
+
     def __init__(self, dataset):
         """ Initialize dataframe by importing europarl data for source and target
 
@@ -62,3 +64,22 @@ class FeatureGeneration:
                 (self.preprocessed_dataset["number_punctuations_total_target"] + self.preprocessed_dataset[
                     "number_words_target"]))
         self.feature_dataframe["Translation"] = self.preprocessed_dataset["Translation"]
+
+        self.feature_dataframe["cosine_similarity_average"] = cosine_similarity_vector(self.preprocessed_dataset[
+                                                                                   "sentence_embedding_average_source"],
+                                                                               self.preprocessed_dataset[
+                                                                                   "sentence_embedding_average_target"])
+
+        self.feature_dataframe["cosine_similarity_tfidf"] = cosine_similarity_vector(self.preprocessed_dataset[
+                                                                                   "sentence_embedding_tf_idf_source"],
+                                                                               self.preprocessed_dataset[
+                                                                                   "sentence_embedding_tf_idf_target"])
+
+        self.feature_dataframe["jaccard_translation_source"] = jaccard(self.preprocessed_dataset[
+                                                                                   "token_preprocessed_embedding_source"],
+                                                                       self.preprocessed_dataset[
+                                                                           "translated_to_target_source"])
+        self.feature_dataframe["jaccard_translation_target"] = jaccard(self.preprocessed_dataset[
+                                                                                   "token_preprocessed_embedding_target"],
+                                                                       self.preprocessed_dataset[
+                                                                           "translated_to_source_target"])

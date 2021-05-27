@@ -31,6 +31,7 @@ import numpy as np
 import pandas as pd
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import PCA
 
 
 def lemmatize(sentence_vector, nlp_language):
@@ -361,9 +362,17 @@ def load_embeddings(embedding_matrix_path='../data/interim/proc_b_src_emb.p',
         matrix /= norms[:]
         return matrix
 
+
     embedding_matrix_normalized = normalize_matrix(embedding_matrix)
 
     return embedding_matrix_normalized, embedding_dictionary
+
+
+def pca_embeddings(embedding_matrix_normalized, k = 10):
+
+    pca = PCA(n_components=k)
+    principalComponents = pca.fit_transform(embedding_matrix_normalized)
+    return np.asmatrix(principalComponents)
 
 
 def word_embeddings(token_vector, embedding_array, embedding_dictionary):
