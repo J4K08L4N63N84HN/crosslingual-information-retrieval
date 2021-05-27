@@ -16,9 +16,6 @@
 - Number of Stopwords
 - Sentiment Analysis
 
-TODO: ADD TF-IDF weighted sentence embedding + pca
-TODO: ADD averaged sentence embedding + pca
-
 Possible next steps:
 - Apply spelling correction
 - Expanding Contractions
