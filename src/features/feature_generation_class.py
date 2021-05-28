@@ -3,7 +3,7 @@
 
 import pandas as pd
 
-from src.features.embed_based import cosine_similarity_vector, jaccard
+from src.features.embed_based import cosine_similarity_vector, jaccard, embedding_difference
 from src.features.sentence_based import difference_numerical, relative_difference_numerical, \
     normalized_difference_numerical
 
@@ -17,7 +17,7 @@ class FeatureGeneration:
         feature_difference_list (list): List of preprocessed columns that should be compared
     """
 
-    def __init__(self, dataset):
+    def __init__(self, dataset, k):
         """ Initialize dataframe by importing europarl data for source and target
 
         Args:
@@ -48,6 +48,7 @@ class FeatureGeneration:
             'number_Pres', 'number_Past', 'number_',
             'score_polarity', 'score_subjectivity',
             'number_stopwords']
+        self.k = k
 
     def feature_generation(self):
         """ Create comparative features of preprocessed columns.
@@ -63,23 +64,57 @@ class FeatureGeneration:
                     "number_words_source"]),
                 (self.preprocessed_dataset["number_punctuations_total_target"] + self.preprocessed_dataset[
                     "number_words_target"]))
-        self.feature_dataframe["Translation"] = self.preprocessed_dataset["Translation"]
 
         self.feature_dataframe["cosine_similarity_average"] = cosine_similarity_vector(self.preprocessed_dataset[
-                                                                                   "sentence_embedding_average_source"],
-                                                                               self.preprocessed_dataset[
-                                                                                   "sentence_embedding_average_target"])
+                                                                                           "sentence_embedding_average_source"],
+                                                                                       self.preprocessed_dataset[
+                                                                                           "sentence_embedding_average_target"])
 
-        self.feature_dataframe["cosine_similarity_tfidf"] = cosine_similarity_vector(self.preprocessed_dataset[
-                                                                                   "sentence_embedding_tf_idf_source"],
-                                                                               self.preprocessed_dataset[
-                                                                                   "sentence_embedding_tf_idf_target"])
+        self.feature_dataframe["cosine_similarity_tf_idf"] = cosine_similarity_vector(self.preprocessed_dataset[
+                                                                                         "sentence_embedding_tf_idf_source"],
+                                                                                     self.preprocessed_dataset[
+                                                                                         "sentence_embedding_tf_idf_target"])
 
         self.feature_dataframe["jaccard_translation_source"] = jaccard(self.preprocessed_dataset[
-                                                                                   "token_preprocessed_embedding_source"],
-                                                                       self.preprocessed_dataset[
-                                                                           "translated_to_target_source"])
-        self.feature_dataframe["jaccard_translation_target"] = jaccard(self.preprocessed_dataset[
-                                                                                   "token_preprocessed_embedding_target"],
+                                                                           "token_preprocessed_embedding_source"],
                                                                        self.preprocessed_dataset[
                                                                            "translated_to_source_target"])
+        self.feature_dataframe["jaccard_translation_target"] = jaccard(self.preprocessed_dataset[
+                                                                           "token_preprocessed_embedding_target"],
+                                                                       self.preprocessed_dataset[
+                                                                           "translated_to_target_source"])
+
+        # self.feature_dataframe["jaccard_named_entities_source"] = jaccard(self.preprocessed_dataset[
+        #                                                                            "list_named_entities_source"],
+        #                                                                self.preprocessed_dataset[
+        #
+        #                                                                   "named_entities_translated_to_source_target"])
+        # self.feature_dataframe["jaccard_named_entities_target"] = jaccard(self.preprocessed_dataset[
+        #                                                                           "list_named_entities_target"],
+        #                                                               self.preprocessed_dataset[
+        #
+        #                                                                   "named_entities_translated_to_target_source"])
+
+        self.feature_dataframe["jaccard_numbers_source"] = jaccard(self.preprocessed_dataset[
+                                                                       "list_named_numbers_source"],
+                                                                   self.preprocessed_dataset[
+                                                                       "list_named_numbers_target"])
+
+        self.feature_dataframe["jaccard_numbers_source"] = jaccard(self.preprocessed_dataset[
+                                                                       "list_named_numbers_source"],
+                                                                   self.preprocessed_dataset[
+                                                                       "list_named_numbers_target"])
+
+        for i in range(self.k):
+            self.feature_dataframe[f"pca_embeddding_average_diff_{i}"] = embedding_difference(self.preprocessed_dataset[
+                                                                                                  "pca_sentence_embedding_average_source"],
+                                                                                              self.preprocessed_dataset[
+                                                                                                  "pca_sentence_embedding_average_target"],
+                                                                                              i)
+            self.feature_dataframe[f"pca_embeddding_tf_idf_diff_{i}"] = embedding_difference(self.preprocessed_dataset[
+                                                                                                 "pca_sentence_embedding_tf_idf_source"],
+                                                                                             self.preprocessed_dataset[
+                                                                                                 "pca_sentence_embedding_tf_idf_target"],
+                                                                                             i)
+
+        self.feature_dataframe["Translation"] = self.preprocessed_dataset["Translation"]
