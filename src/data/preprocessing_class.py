@@ -24,9 +24,7 @@ class PreprocessingEuroParl:
         preprocessed (dataframe): Preprocessed dataframe for source sentences
     """
 
-    def __init__(self, sentence_data_source='../../data/external/europarl-v7.de-en.en',
-                 sentence_data_target='../../data/external/europarl-v7.de-en.de',
-                 number_datapoints=100):
+    def __init__(self, df_sampled_path="../data/interim/europarl_english_german.pkl"):
         """ Initialize dataframe by importing europarl data for source and target
 
         Args:
@@ -34,16 +32,16 @@ class PreprocessingEuroParl:
             sentence_data_target (str): Path of the europarl target dataset
             number_datapoints (int): Size of the sample of the europarl dataset
         """
-        self.dataframe = import_data(sentence_data_source, sentence_data_target, number_datapoints)
+        self.dataframe = import_data(df_sampled_path)
         self.punctuation_list = list(string.punctuation)
         self.pos_list = ['ADJ', 'ADP', 'ADV', 'AUX', 'CONJ', 'CCONJ', 'DET', 'INTJ', 'NOUN', 'NUM', 'PRT', 'PRON',
                          'PROPN', 'SCONJ', 'SYM', 'VERB', 'X']
         self.tense_list = ['Pres', 'Past', '']
         self.preprocessed = pd.DataFrame()
 
-    def preprocess_sentences(self, stopwords_source, nlp_source, textblob_source, embedding_matrix_source_path,
+    def preprocess_sentences(self, stopwords_source, nlp_source, textblob_source, embedding_array_source_path,
                              embedding_dictionary_source_path, stopwords_target, nlp_target, textblob_target,
-                             embedding_matrix_target_path,
+                             embedding_array_target_path,
                              embedding_dictionary_target_path,
                              n_neighbors,
                              number_pc):
@@ -53,14 +51,15 @@ class PreprocessingEuroParl:
             stopwords_source (list): List of stopwords to remove and count
             nlp_source (spacy pipeline): Spacy pipeline for preprocessing
             textblob_source (textblob object): Textblob object for sentiment analysis
-            embedding_matrix_source_path (str): Path to embedding matrix
+            embedding_array_source_path (str): Path to embedding array
             embedding_dictionary_source_path (str): Path to embedding dictionary
             stopwords_target (list): List of stopwords to remove and count
             nlp_target (spacy pipeline): Spacy pipeline for preprocessing
             textblob_target (textblob object): Textblob object for sentiment analysis
-            embedding_matrix_target_path (str): Path to embedding matrix
+            embedding_array_target_path (str): Path to embedding array
             embedding_dictionary_target_path (str): Path to embedding dictionary
         """
+        self.preprocessed["id"] = self.dataframe["id"]
         self.preprocessed["token_preprocessed_embedding_source"] = create_cleaned_token_embedding((self.dataframe[
             "text_source"]), nlp_source, stopwords_source)
         self.preprocessed["token_preprocessed_embedding_target"] = create_cleaned_token_embedding((self.dataframe[
@@ -140,60 +139,60 @@ class PreprocessingEuroParl:
         self.preprocessed["list_named_numbers_source"] = named_numbers(self.dataframe["text_source"])
         self.preprocessed["list_named_numbers_target"] = named_numbers(self.dataframe["text_target"])
 
-        embedding_matrix_normalized_source, embedding_dictionary_source = load_embeddings(
-            embedding_matrix_source_path, embedding_dictionary_source_path)
-        embedding_matrix_normalized_target, embedding_dictionary_target = load_embeddings(
-            embedding_matrix_target_path, embedding_dictionary_target_path)
+        embedding_array_normalized_source, embedding_dictionary_source = load_embeddings(
+            embedding_array_source_path, embedding_dictionary_source_path)
+        embedding_array_normalized_target, embedding_dictionary_target = load_embeddings(
+            embedding_array_target_path, embedding_dictionary_target_path)
 
-        embedding_matrix_pca_source = pca_embeddings(embedding_matrix_normalized_source, number_pc)
-        embedding_matrix_pca_target = pca_embeddings(embedding_matrix_normalized_target, number_pc)
+        embedding_array_pca_source = pca_embeddings(embedding_array_normalized_source, number_pc)
+        embedding_array_pca_target = pca_embeddings(embedding_array_normalized_target, number_pc)
 
         self.preprocessed["word_embedding_source"] = word_embeddings(
             self.preprocessed["token_preprocessed_embedding_source"],
-            embedding_matrix_normalized_source,
+            embedding_array_normalized_source,
             embedding_dictionary_source)
         self.preprocessed["word_embedding_target"] = word_embeddings(
             self.preprocessed["token_preprocessed_embedding_target"],
-            embedding_matrix_normalized_target,
+            embedding_array_normalized_target,
             embedding_dictionary_target)
 
         self.preprocessed["pca_word_embedding_source"] = word_embeddings(
             self.preprocessed["token_preprocessed_embedding_source"],
-            embedding_matrix_pca_source,
+            embedding_array_pca_source,
             embedding_dictionary_source)
         self.preprocessed["pca_word_embedding_target"] = word_embeddings(
             self.preprocessed["token_preprocessed_embedding_target"],
-            embedding_matrix_pca_target,
+            embedding_array_pca_target,
             embedding_dictionary_target)
 
         self.preprocessed["translated_to_target_source"] = translate_words(
             self.preprocessed["token_preprocessed_embedding_source"],
             embedding_dictionary_source,
-            embedding_matrix_normalized_source,
+            embedding_array_normalized_source,
             embedding_dictionary_target,
-            embedding_matrix_normalized_target,
+            embedding_array_normalized_target,
             n_neighbors)
         self.preprocessed["translated_to_source_target"] = translate_words(
             self.preprocessed["token_preprocessed_embedding_target"],
             embedding_dictionary_target,
-            embedding_matrix_normalized_target,
+            embedding_array_normalized_target,
             embedding_dictionary_source,
-            embedding_matrix_normalized_source,
+            embedding_array_normalized_source,
             n_neighbors)
 
         # self.preprocessed["named_entities_translated_to_target_source"] = translate_words(
         #     self.preprocessed["list_named_entities_source"],
         #     embedding_dictionary_source,
-        #     embedding_matrix_normalized_source,
+        #     embedding_array_normalized_source,
         #     embedding_dictionary_target,
-        #     embedding_matrix_normalized_target,
+        #     embedding_array_normalized_target,
         #     n_neighbors)
         # self.preprocessed["named_entities_translated_to_source_target"] = translate_words(
         #     self.preprocessed["list_named_entities_target"],
         #     embedding_dictionary_target,
-        #     embedding_matrix_normalized_target,
+        #     embedding_array_normalized_target,
         #     embedding_dictionary_source,
-        #     embedding_matrix_normalized_source,
+        #     embedding_array_normalized_source,
         #     n_neighbors)
 
         self.preprocessed["tf_idf_source"] = tf_idf_vector(self.preprocessed["token_preprocessed_embedding_source"])
