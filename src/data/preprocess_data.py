@@ -363,31 +363,31 @@ def named_numbers(token_vector):
     return token_vector.apply(lambda sentence: re.findall(r'\d+',sentence))
 
 
-def load_embeddings(embedding_matrix_path='../data/interim/proc_b_src_emb.p',
-                    embedding_dictionary_path='../data/interim/proc_b_src_word.p'):
-    with open(embedding_matrix_path, 'rb') as fp:
-        embedding_matrix = pickle.load(fp)
+def load_embeddings(embedding_array_path,
+                    embedding_dictionary_path):
+    with open(embedding_array_path, 'rb') as fp:
+        embedding_array = pickle.load(fp)
     with open(embedding_dictionary_path, 'rb') as fp:
         embedding_dictionary = pickle.load(fp)
 
-    def normalize_matrix(matrix):
-        norms = np.sqrt(np.sum(np.square(matrix), axis=1))
+    def normalize_array(array):
+        norms = np.sqrt(np.sum(np.square(array), axis=1))
         norms[norms == 0] = 1
         norms = norms.reshape(-1, 1)
-        matrix /= norms[:]
-        return matrix
+        array /= norms[:]
+        return array
 
 
-    embedding_matrix_normalized = normalize_matrix(embedding_matrix)
+    embedding_array_normalized = normalize_array(np.vstack(embedding_array))
 
-    return embedding_matrix_normalized, embedding_dictionary
+    return embedding_array_normalized, embedding_dictionary
 
 
-def pca_embeddings(embedding_matrix_normalized, k = 10):
+def pca_embeddings(embedding_array_normalized, k = 10):
 
     pca = PCA(n_components=k)
-    principalComponents = pca.fit_transform(embedding_matrix_normalized)
-    return np.asmatrix(principalComponents)
+    principalComponents = pca.fit_transform(embedding_array_normalized)
+    return np.asarray(principalComponents)
 
 
 def word_embeddings(token_vector, embedding_array, embedding_dictionary):
@@ -395,7 +395,7 @@ def word_embeddings(token_vector, embedding_array, embedding_dictionary):
 
        Args:
            token_vector (numpy.array): Array containing text
-           embedding_array (array): Path to the embedding matrix
+           embedding_array (array): Path to the embedding array
            embedding_dictionary (dictionary): Path to the embedding dictionary
 
        Returns:
@@ -404,13 +404,13 @@ def word_embeddings(token_vector, embedding_array, embedding_dictionary):
        """
 
     def token_list_embedding(embedding_array, embedding_dictionary, token_list):
-        """ Function to retrieve the embeddings from the matrix
+        """ Function to retrieve the embeddings from the array
         """
-        dictionary = {}
+        word_embedding_dictionary = {}
         for i in range(len(token_list)):
             if embedding_dictionary.get(token_list[i]):
-                dictionary[token_list[i]] = embedding_array[embedding_dictionary.get(token_list[i])].tolist()[0]
-        embedding_dataframe = pd.DataFrame(dictionary)
+                word_embedding_dictionary[token_list[i]] = embedding_array[embedding_dictionary.get(token_list[i])].tolist()
+        embedding_dataframe = pd.DataFrame(word_embedding_dictionary)
         return embedding_dataframe
 
     return token_vector.apply(lambda token_list: token_list_embedding(embedding_array, embedding_dictionary,
@@ -434,7 +434,7 @@ def translate_words(token_vector, embedding_dictionary_source, embedding_array_n
             similarity_cos = np.dot(norm_src_word_emb, np.transpose(embedding_array_normalized_target))
 
             # Find Closest Neighbors
-            most_similar_trg_index = np.argsort(-similarity_cos[[0]])[:n_neighbors].tolist()[0][:n_neighbors]
+            most_similar_trg_index = np.argsort(-similarity_cos)[:n_neighbors].tolist()
 
             inverse_trg_word = {index: word for word, index in embedding_dictionary_target.items()}
             for single_neighbor in most_similar_trg_index:
@@ -450,7 +450,7 @@ def translate_words(token_vector, embedding_dictionary_source, embedding_array_n
 def sentence_embedding_average(embedding_token_vector):
     """ Function to create average sentence embedding
        Args:
-           embedding_token_vector (numpy.array): Array containing embedding matrix of the token
+           embedding_token_vector (numpy.array): Array containing embedding array of the token
 
        Returns:
            numpy.array: Array containing average of the embeddings
@@ -476,7 +476,7 @@ def sentence_embedding_tf_idf(embedding_array_dataframe, tf_idf_dict_vec):
 
         Args:
             token_vector (numpy.array): Array containing text
-            embedding_array (array): Path to the embedding matrix
+            embedding_array (array): Path to the embedding array
             embedding_dictionary (dictionary): Path to the embedding dictionary
 
         Returns:

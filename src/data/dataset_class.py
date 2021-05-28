@@ -18,14 +18,16 @@ class DataSet:
             preprocessed_class (class): Path of the europarl source dataset
         """
         self.preprocessed_dataframe = preprocessed_class.preprocessed
-        self.preprocessed_source = preprocessed_class.preprocessed.filter(regex='source$', axis=1)
-        self.preprocessed_target = preprocessed_class.preprocessed.filter(regex='target$', axis=1)
+        self.preprocessed_source = preprocessed_class.preprocessed.filter(regex='source$|id$', axis=1).rename(
+            columns={"id": "id_source"})
+        self.preprocessed_target = preprocessed_class.preprocessed.filter(regex='target$|id$', axis=1).rename(
+            columns={"id": "id_target"})
         self.dataset = pd.DataFrame
         self.testset = pd.DataFrame()
         self.query = pd.DataFrame()
         self.documents = pd.DataFrame()
 
-    def get_sample(self, n_training, n_test_queries, n_test_documents):
+    def get_sample(self, n_training, n_test_queries, n_test_documents, k):
         """ Method to generate a training set of 2n with n correct examples and n wrong examples and a
         independent testset of 1000 queries and 10.000 documents as a crossjoin.
 
@@ -34,28 +36,27 @@ class DataSet:
               n (int): Number of correct and incorrect sentence pairs
 
                """
-        # create query and document frames
-        self.query = self.preprocessed_dataframe.filter(regex='source$', axis=1).iloc[:n_test_queries]
-        self.documents = self.preprocessed_dataframe.filter(regex='target$', axis=1).iloc[:n_test_documents]
-        # generate a cross set of the queries and documents
-        self.testset = self.query.reset_index().merge(self.documents.reset_index(), how='cross')
-        # label with 1 if its right translation and 0 for the wrong translation
-        for index_label, row_series in self.testset.iterrows():
-            if self.testset.at[index_label, 'index_x'] == self.testset.at[index_label, 'index_y']:
-                self.testset.at[index_label, 'Translation'] = 1
-            else:
-                self.testset.at[index_label, 'Translation'] = 0
-        self.testset.drop(columns=['index_x', 'index_y'], inplace=True)
-        # drop first 10.000 documents from train set to make sure that its independent
-        self.preprocessed_dataframe.drop(self.preprocessed_dataframe.index[:n_test_documents], inplace=True)
-        self.preprocessed_source.drop(self.preprocessed_source.index[:n_test_queries], inplace=True)
-        self.preprocessed_target.drop(self.preprocessed_target.index[:n_test_documents], inplace=True)
+        self.query = self.preprocessed_dataframe.filter(regex='source$|id$', axis=1).iloc[:n_test_queries].rename(
+            columns={"id": "id_source"})
+        self.documents = self.preprocessed_dataframe.filter(regex='target$|id$', axis=1).iloc[
+                            :n_test_documents].rename(
+            columns={"id": "id_target"})
 
-        random_sample_right = self.preprocessed_dataframe.sample(n_training).reset_index(drop=True)
-        random_sample_wrong = pd.concat([self.preprocessed_source.sample(n_training).reset_index(drop=True),
-                                         self.preprocessed_target.sample(n_training).reset_index(drop=True)],
-                                        axis=1)
-        random_sample_wrong["Translation"] = np.zeros((int(random_sample_wrong.shape[0]), 1),
-                                                      dtype=np.int8)
+        self.testset = self.query.reset_index().merge(self.documents.reset_index(), how='cross')
+
+        self.testset["Translation"] = (self.testset["id_source"] == self.testset["id_target"]).astype("int")
+
+        random_sample_right = self.preprocessed_dataframe.iloc[n_test_queries:].sample(n_training).reset_index(
+            drop=True)
+        random_sample_right.rename(columns={"id": "id_source"}, inplace = True)
+        random_sample_right["id_target"] = random_sample_right["id_source"]
+
+        random_sample_wrong = pd.concat(
+            [self.preprocessed_source.iloc[n_test_queries:].sample(k * n_training).reset_index(drop=True),
+             self.preprocessed_target.iloc[n_test_documents:].sample(
+                 k * n_training, replace=True).reset_index(drop=True)],
+            axis=1)
+        random_sample_wrong["Translation"] = (
+                    random_sample_wrong["id_source"] == random_sample_wrong["id_target"]).astype("int")
 
         self.dataset = pd.concat([random_sample_right, random_sample_wrong]).reset_index(drop=True)
