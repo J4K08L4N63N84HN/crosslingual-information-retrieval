@@ -3,9 +3,11 @@
 
 import pandas as pd
 
-from src.features.embed_based import cosine_similarity_vector, jaccard, embedding_difference
+from src.features.embed_based import cosine_similarity_vector, jaccard, embedding_difference, euclidean_distance_vector, \
+    word_mover_distance_vector
 from src.features.sentence_based import difference_numerical, relative_difference_numerical, \
     normalized_difference_numerical
+
 
 
 class FeatureGeneration:
@@ -65,15 +67,30 @@ class FeatureGeneration:
                 (self.preprocessed_dataset["number_punctuations_total_target"] + self.preprocessed_dataset[
                     "number_words_target"]))
 
+        self.feature_dataframe["word_mover_distance"] = word_mover_distance_vector(self.preprocessed_dataset[
+                                                                                           "word_embedding_source"],
+                                                                                       self.preprocessed_dataset[
+                                                                                           "word_embedding_target"])
+
         self.feature_dataframe["cosine_similarity_average"] = cosine_similarity_vector(self.preprocessed_dataset[
                                                                                            "sentence_embedding_average_source"],
                                                                                        self.preprocessed_dataset[
                                                                                            "sentence_embedding_average_target"])
 
         self.feature_dataframe["cosine_similarity_tf_idf"] = cosine_similarity_vector(self.preprocessed_dataset[
-                                                                                         "sentence_embedding_tf_idf_source"],
-                                                                                     self.preprocessed_dataset[
-                                                                                         "sentence_embedding_tf_idf_target"])
+                                                                                          "sentence_embedding_tf_idf_source"],
+                                                                                      self.preprocessed_dataset[
+                                                                                          "sentence_embedding_tf_idf_target"])
+
+        self.feature_dataframe["euclidean_distance_average"] = euclidean_distance_vector(self.preprocessed_dataset[
+                                                                                             "sentence_embedding_average_source"],
+                                                                                         self.preprocessed_dataset[
+                                                                                             "sentence_embedding_average_target"])
+
+        self.feature_dataframe["euclidean_distance_tf_idf"] = euclidean_distance_vector(self.preprocessed_dataset[
+                                                                                            "sentence_embedding_tf_idf_source"],
+                                                                                        self.preprocessed_dataset[
+                                                                                            "sentence_embedding_tf_idf_target"])
 
         self.feature_dataframe["jaccard_translation_source"] = jaccard(self.preprocessed_dataset[
                                                                            "token_preprocessed_embedding_source"],
