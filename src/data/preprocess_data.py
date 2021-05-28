@@ -23,9 +23,12 @@ Possible next steps:
 - Remove special characters
 - Expanding abbreviations
 
+TODO: Fix Translation of Named Entities
+
 """
 import pickle
 import string
+import re
 
 import numpy as np
 import pandas as pd
@@ -333,19 +336,31 @@ def number_stopwords(sentence_vector, stopwords_language):
     return sentence_vector.apply(lambda sentence: len([word for word in sentence if word in stopwords_language]))
 
 
-def named_entities(sentence_vector, nlp_language):
-    """ unction to generate the subjectivity in a given vector of BoW-sentences
+# def named_entities(sentence_vector, nlp_language):
+#     """ unction to generate the subjectivity in a given vector of BoW-sentences
+#
+#         Args:
+#             sentence_vector (numpy.array): BoW array
+#             nlp_language (str): Language of the array
+#
+#         Returns:
+#             numpy.array: Array containing the total number of named entities in a given language
+#
+#         """
+#     return sentence_vector.apply(
+#         lambda sentence: [name for name in nlp_language(sentence).ents])
+
+def named_numbers(token_vector):
+    """ Function to remove numbers out of an array of sentences
 
         Args:
-            sentence_vector (numpy.array): BoW array
-            nlp_language (str): Language of the array
+            token_vector (numpy.array): Array containing tokenized, lowercased sentence
 
         Returns:
-            numpy.array: Array containing the total number of named entities in a given language
+            numpy.array: Array containing tokenized sentence removed numbers
 
         """
-    return sentence_vector.apply(
-        lambda sentence: [name for name in nlp_language(sentence).ents])
+    return token_vector.apply(lambda sentence: re.findall(r'\d+',sentence))
 
 
 def load_embeddings(embedding_matrix_path='../data/interim/proc_b_src_emb.p',
@@ -475,7 +490,7 @@ def sentence_embedding_tf_idf(embedding_array_dataframe, tf_idf_dict_vec):
         for i in range(embedding_dataframe.shape[1]):
             embedding_dataframe[embedding_dataframe.columns[i]] = embedding_dataframe[embedding_dataframe.columns[i]] * \
                                                                   tf_idf_dict[embedding_dataframe.columns[i]]
-        return [embedding_dataframe.values.mean(axis=1)]
+        return [pd.Series(embedding_dataframe.values.mean(axis=1))]
 
     weighted_average = df.apply(lambda x: aggregate_tf_idf_embedding(x.embedding_array_vec, x.tf_idf_dict_vec), axis=1)
 

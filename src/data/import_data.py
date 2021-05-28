@@ -41,4 +41,4 @@ def import_data(sentence_data_source='../data/external/europarl-v7.de-en.en',
     # create data frame with sentences
     df = pd.DataFrame({'text_source': sentences_source, 'text_target': sentences_target}, columns=['text_source',
                                                                                                    'text_target'])
-    return df.sample(number_datapoints)  # reduce number for testing code
+    return df.sample(number_datapoints).reset_index(drop=True)  # reduce number for testing code
