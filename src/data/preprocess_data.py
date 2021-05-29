@@ -23,8 +23,6 @@ Possible next steps:
 - Remove special characters
 - Expanding abbreviations
 
-TODO: Fix Translation of Named Entities
-
 """
 import pickle
 import string
@@ -36,7 +34,24 @@ from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import PCA
 
+import functools
+import time
 
+
+def timer(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        value = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        run_time = end_time - start_time
+        print("Finished {} in {} secs".format(repr(func.__name__), round(run_time, 3)))
+        return value
+
+    return wrapper
+
+
+@timer
 def lemmatize(sentence_vector, nlp_language):
     """ Function to lemmatize an array of tokens.
 
@@ -52,6 +67,7 @@ def lemmatize(sentence_vector, nlp_language):
     return sentence_vector.apply(lambda sentence: " ".join([token.lemma_ for token in nlp_language(sentence)]))
 
 
+@timer
 def tokenize_sentence(sentence_vector):
     """ Function to tokenize an array of sentences.
 
@@ -65,6 +81,7 @@ def tokenize_sentence(sentence_vector):
     return sentence_vector.apply(lambda sentence: word_tokenize(sentence))
 
 
+@timer
 def strip_whitespace(token_vector):
     """ Function to strip whitespaces of an array of sentences.
 
@@ -78,6 +95,7 @@ def strip_whitespace(token_vector):
     return token_vector.apply(lambda word: list(map(str.strip, word)))
 
 
+@timer
 def lowercase(token_vector):
     """ Function to lowercase an array of sentences.
 
@@ -91,6 +109,7 @@ def lowercase(token_vector):
     return token_vector.apply(lambda row: list(map(str.lower, row)))
 
 
+@timer
 def remove_punctuation(token_vector):
     """ Function to remove punctuation out of an array of sentences
 
@@ -101,10 +120,11 @@ def remove_punctuation(token_vector):
             numpy.array: Array containing tokenized sentence removed punctuation
 
         """
-    punctuations = string.punctuation + "’"
+    punctuations = string.punctuation + "’" + "..." + "'"
     return token_vector.apply(lambda sentence: [word for word in sentence if word not in punctuations])
 
 
+@timer
 def remove_stopwords(token_vector, stopwords_language):
     """ Function to remove stopwords out of an array of sentences
 
@@ -118,6 +138,7 @@ def remove_stopwords(token_vector, stopwords_language):
     return token_vector.apply(lambda sentence: [word for word in sentence if word not in stopwords_language])
 
 
+@timer
 def remove_numbers(token_vector):
     """ Function to remove numbers out of an array of sentences
 
@@ -132,6 +153,7 @@ def remove_numbers(token_vector):
     return token_vector.apply(lambda sentence: [word.translate(translation_table) for word in sentence])
 
 
+@timer
 def create_cleaned_token_embedding(sentence_vector, nlp_language, stopwords_language):
     """ Function combine cleaning function for embedding-based features
 
@@ -155,6 +177,7 @@ def create_cleaned_token_embedding(sentence_vector, nlp_language, stopwords_lang
     return token_vector_preprocessed
 
 
+@timer
 def create_cleaned_text(sentence_vector):
     """ Function combine cleaning function for text-based features
 
@@ -173,6 +196,7 @@ def create_cleaned_text(sentence_vector):
     return token_vector_lowercase
 
 
+@timer
 def number_punctuations_total(sentence_vector):
     """ Function to generate the number of all punctuation marks in a given vector of BoW-Sentences.
 
@@ -193,6 +217,7 @@ def number_punctuations_total(sentence_vector):
     return sentence_vector.apply(lambda sentence: len([word for word in sentence if word in list_pm]))
 
 
+@timer
 def number_words(sentence_vector):
     """ Function to generate the number of words in a given vector of BoW-Sentences.
 
@@ -207,6 +232,7 @@ def number_words(sentence_vector):
         lambda sentence: len([word for word in sentence if word not in string.punctuation]))
 
 
+@timer
 def number_unique_words(sentence_vector):
     """ Function to generate the number of unique words in a given vector of BoW-Sentences.
 
@@ -221,6 +247,7 @@ def number_unique_words(sentence_vector):
         lambda sentence: len(np.unique([word for word in sentence if word not in string.punctuation])))
 
 
+@timer
 def number_punctuation_marks(sentence_vector, punctuation_mark):
     """ Function to generate the number of a given punctuation mark in a given vector of BoW-Sentences.
 
@@ -235,6 +262,7 @@ def number_punctuation_marks(sentence_vector, punctuation_mark):
     return sentence_vector.apply(lambda sentence: len([word for word in sentence if word == punctuation_mark]))
 
 
+@timer
 def number_characters(sentence_vector):
     """ Function to generate the number of characters in a given vector of BoW-Sentences.
 
@@ -249,6 +277,7 @@ def number_characters(sentence_vector):
                                  np.sum([len(word) for word in sentence if word not in string.punctuation]))
 
 
+@timer
 def average_characters(character_vector, word_vector):
     """ Function to generate the number of characters per word in a given vector of BoW-Sentences.
 
@@ -263,6 +292,7 @@ def average_characters(character_vector, word_vector):
     return (character_vector / word_vector).replace(np.nan, 0).replace(np.inf, 0).replace(np.log(0), 0)
 
 
+@timer
 def number_pos(sentence_vector, nlp_language, pos):
     """ Function to generate the number of a given part-of-speech tag in a given vector of BoW-Sentences.
 
@@ -278,6 +308,7 @@ def number_pos(sentence_vector, nlp_language, pos):
     return sentence_vector.apply(lambda sentence: len([token for token in nlp_language(sentence) if token.pos_ == pos]))
 
 
+@timer
 def number_times(sentence_vector, nlp_language, tense):
     """ Function to generate the number of a given tense verb tag in a given vector of BoW-Sentences.
 
@@ -294,6 +325,7 @@ def number_times(sentence_vector, nlp_language, tense):
         "Tense") == tense]))
 
 
+@timer
 def polarity(sentence_vector, textblob_language):
     """ Function to generate the polarity in a given vector of BoW-sentences
 
@@ -308,6 +340,7 @@ def polarity(sentence_vector, textblob_language):
     return sentence_vector.apply(lambda sentence: textblob_language(sentence).sentiment.polarity)
 
 
+@timer
 def subjectivity(sentence_vector, textblob_language):
     """ Function to generate the subjectivity in a given vector of BoW-sentences
 
@@ -322,6 +355,7 @@ def subjectivity(sentence_vector, textblob_language):
     return sentence_vector.apply(lambda sentence: textblob_language(sentence).sentiment.subjectivity)
 
 
+@timer
 def number_stopwords(sentence_vector, stopwords_language):
     """ Function to generate the number of stopwords in a given vector of BoW-Sentences.
 
@@ -350,6 +384,7 @@ def number_stopwords(sentence_vector, stopwords_language):
 #     return sentence_vector.apply(
 #         lambda sentence: [name for name in nlp_language(sentence).ents])
 
+@timer
 def named_numbers(token_vector):
     """ Function to remove numbers out of an array of sentences
 
@@ -360,9 +395,10 @@ def named_numbers(token_vector):
             numpy.array: Array containing tokenized sentence removed numbers
 
         """
-    return token_vector.apply(lambda sentence: re.findall(r'\d+',sentence))
+    return token_vector.apply(lambda sentence: re.findall(r'\d+', sentence))
 
 
+@timer
 def load_embeddings(embedding_array_path,
                     embedding_dictionary_path):
     with open(embedding_array_path, 'rb') as fp:
@@ -377,19 +413,19 @@ def load_embeddings(embedding_array_path,
         array /= norms[:]
         return array
 
-
     embedding_array_normalized = normalize_array(np.vstack(embedding_array))
 
     return embedding_array_normalized, embedding_dictionary
 
 
-def pca_embeddings(embedding_array_normalized, k = 10):
-
+@timer
+def pca_embeddings(embedding_array_normalized, k=10):
     pca = PCA(n_components=k)
     principalComponents = pca.fit_transform(embedding_array_normalized)
     return np.asarray(principalComponents)
 
 
+@timer
 def word_embeddings(token_vector, embedding_array, embedding_dictionary):
     """ Function to create embeddings for the preprocessed words.
 
@@ -409,7 +445,8 @@ def word_embeddings(token_vector, embedding_array, embedding_dictionary):
         word_embedding_dictionary = {}
         for i in range(len(token_list)):
             if embedding_dictionary.get(token_list[i]):
-                word_embedding_dictionary[token_list[i]] = embedding_array[embedding_dictionary.get(token_list[i])].tolist()
+                word_embedding_dictionary[token_list[i]] = embedding_array[
+                    embedding_dictionary.get(token_list[i])].tolist()
         embedding_dataframe = pd.DataFrame(word_embedding_dictionary)
         return embedding_dataframe
 
@@ -417,36 +454,74 @@ def word_embeddings(token_vector, embedding_array, embedding_dictionary):
                                                                       token_list))
 
 
-def translate_words(token_vector, embedding_dictionary_source, embedding_array_normalized_source,
-                    embedding_dictionary_target, embedding_array_normalized_target, n_neighbors):
-    def calculate_translations(word_list, embedding_dictionary_source, embedding_array_normalized_source,
-                               embedding_dictionary_target, embedding_array_normalized_target, n_neighbors):
+@timer
+def create_translation_dictionary(token_vector_source, token_vector_target,
+                                  embedding_array_normalized_source, embedding_dictionary_source,
+                                  embedding_array_normalized_target, embedding_dictionary_target):
+    unique_token_source = set([item for sublist in token_vector_source for item in sublist])
+    unique_token_target = set([item for sublist in token_vector_target for item in sublist])
+
+    source_index = 0
+    word_embedding_dictionary_source = {}
+    embedding_subset_dictionary_source = {}
+    for token in unique_token_source:
+        if embedding_dictionary_source.get(token):
+            word_embedding_dictionary_source[token] = embedding_array_normalized_source[
+                embedding_dictionary_source.get(token)].tolist()
+            embedding_subset_dictionary_source[source_index] = token
+            source_index += 1
+
+    target_index = 0
+    word_embedding_dictionary_target = {}
+    embedding_subset_dictionary_target = {}
+    for token in unique_token_target:
+        if embedding_dictionary_target.get(token):
+            word_embedding_dictionary_target[token] = embedding_array_normalized_target[
+                embedding_dictionary_target.get(token)].tolist()
+            embedding_subset_dictionary_target[target_index] = token
+            target_index += 1
+
+    embedding_subset_source = np.array(list(word_embedding_dictionary_source.values()))
+    embedding_subset_target = np.array(list(word_embedding_dictionary_target.values()))
+
+    def translation(token, word_embedding_dictionary_source, embedding_subset_target,
+                    embedding_subset_dictionary_target):
+        norm_src_word_emb = word_embedding_dictionary_source[token]
+        similarity_cos = np.dot(norm_src_word_emb, np.transpose(embedding_subset_target))
+        most_similar_trg_index = np.argsort(-similarity_cos)[0].tolist()
+        return embedding_subset_dictionary_target[most_similar_trg_index]
+
+    translation_to_target_source = {}
+    for token in unique_token_source:
+        if embedding_dictionary_source.get(token):
+            translation_to_target_source[token] = translation(token, word_embedding_dictionary_source,
+                                                              embedding_subset_target,
+                                                              embedding_subset_dictionary_target)
+
+    translation_to_source_target = {}
+    for token in unique_token_target:
+        if embedding_dictionary_target.get(token):
+            translation_to_source_target[token] = translation(token, word_embedding_dictionary_target,
+                                                              embedding_subset_source,
+                                                              embedding_subset_dictionary_source)
+
+    return translation_to_target_source, translation_to_source_target
+
+
+@timer
+def translate_words(token_vector, translation_dictionary):
+    def calculate_translations(word_list, translation_dictionary):
         translation_list = []
         for word in word_list:
-
             try:
-                given_source_index = embedding_dictionary_source[word]
+                translation_list.append(translation_dictionary[word])
             except KeyError:
                 continue
-
-            # Calculate Cos Similarity
-            norm_src_word_emb = embedding_array_normalized_source[given_source_index]
-            similarity_cos = np.dot(norm_src_word_emb, np.transpose(embedding_array_normalized_target))
-
-            # Find Closest Neighbors
-            most_similar_trg_index = np.argsort(-similarity_cos)[:n_neighbors].tolist()
-
-            inverse_trg_word = {index: word for word, index in embedding_dictionary_target.items()}
-            for single_neighbor in most_similar_trg_index:
-                translation_list.append(inverse_trg_word[single_neighbor])
         return translation_list
 
-    return token_vector.apply(lambda token_list: calculate_translations(token_list, embedding_dictionary_source,
-                                                                        embedding_array_normalized_source,
-                                                                        embedding_dictionary_target,
-                                                                        embedding_array_normalized_target, n_neighbors))
+    return token_vector.apply(lambda token_list: calculate_translations(token_list, translation_dictionary))
 
-
+@timer
 def sentence_embedding_average(embedding_token_vector):
     """ Function to create average sentence embedding
        Args:
@@ -458,6 +533,7 @@ def sentence_embedding_average(embedding_token_vector):
     return embedding_token_vector.apply(lambda embedding_token: [embedding_token.mean(axis=1)])
 
 
+@timer
 def tf_idf_vector(token_vector):
     def identity_tokenizer(text):
         return text
@@ -471,6 +547,7 @@ def tf_idf_vector(token_vector):
     return df_tf_idf.to_dict(orient='records')
 
 
+@timer
 def sentence_embedding_tf_idf(embedding_array_dataframe, tf_idf_dict_vec):
     """ Function to create tf-idf weighted sentence embedding
 
