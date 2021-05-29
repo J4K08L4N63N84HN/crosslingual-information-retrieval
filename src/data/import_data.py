@@ -3,8 +3,9 @@
 
 import pandas as pd
 import pickle
+from src.data.preprocess_data import timer
 
-
+@timer
 def load_doc(filename):
     """ Function to load doc into memory. """
     # open the file as read only
@@ -13,12 +14,12 @@ def load_doc(filename):
     file.close()
     return text
 
-
+@timer
 def to_sentences(doc):
     """ Function to split a loaded document into sentences. """
     return doc.strip().split('\n')
 
-
+@timer
 def create_data_subset(sentence_data_source='../data/external/europarl-v7.de-en.en',
                        sentences_data_target='../data/external/europarl-v7.de-en.de',
                        sample_size=200000,
@@ -45,7 +46,7 @@ def create_data_subset(sentence_data_source='../data/external/europarl-v7.de-en.
     df_sampled.to_pickle(sentence_data_sampled_path)
     print("Sampled dataframe saved in: " + sentence_data_sampled_path)
 
-
+@timer
 def import_data(df_sampled_path="../data/interim/europarl_english_german.pkl"):
     """ Function to import the data and concatenate it into a dataframe.
 
