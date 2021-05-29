@@ -4,8 +4,10 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
 from wmd import WMD
+from src.data.preprocess_data import timer
 
 
+@timer
 def cosine_similarity_vector(sentence_embedding_source_vector, sentence_embedding_target_vector):
     df = pd.DataFrame()
     df['sentence_embedding_source'] = sentence_embedding_source_vector
@@ -24,6 +26,7 @@ def cosine_similarity_vector(sentence_embedding_source_vector, sentence_embeddin
     return cosine_similarity_score
 
 
+@timer
 def euclidean_distance_vector(sentence_embedding_source_vector, sentence_embedding_target_vector):
     df = pd.DataFrame()
     df['sentence_embedding_source'] = sentence_embedding_source_vector
@@ -42,6 +45,7 @@ def euclidean_distance_vector(sentence_embedding_source_vector, sentence_embeddi
     return euclidean_distance_score
 
 
+@timer
 def word_mover_distance_vector(word_embedding_source_vector, word_embedding_target_vector):
     df = pd.DataFrame()
     df['word_embedding_source'] = word_embedding_source_vector
@@ -72,6 +76,7 @@ def word_mover_distance_vector(word_embedding_source_vector, word_embedding_targ
     return word_mover_distance_score
 
 
+@timer
 def jaccard(vector_source, vector_target):
     df = pd.DataFrame()
     df['original'] = vector_source
@@ -91,6 +96,7 @@ def jaccard(vector_source, vector_target):
     return jaccard_vec
 
 
+@timer
 def embedding_difference(vector_embedding_source, vector_embedding_target, i):
     df = pd.DataFrame()
     df['source'] = vector_embedding_source

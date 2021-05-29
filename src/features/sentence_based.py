@@ -13,8 +13,10 @@
 """
 
 import numpy as np
+from src.data.preprocess_data import timer
 
 
+@timer
 def difference_numerical(source_array, target_array):
     """ Function to generate the difference of a given feature variable
 
@@ -30,6 +32,7 @@ def difference_numerical(source_array, target_array):
     return (target_array - source_array).replace(np.nan, 0).replace(np.inf, 0).replace(np.log(0), 0)
 
 
+@timer
 def relative_difference_numerical(source_array, target_array):
     """ Function to generate the relative difference of a given feature variable
 
@@ -45,6 +48,7 @@ def relative_difference_numerical(source_array, target_array):
     return ((target_array - source_array) / source_array).replace(np.nan, 0).replace(np.inf, 0).replace(np.log(0), 0)
 
 
+@timer
 def normalized_difference_numerical(source_array, target_array, source_sentence_length, target_sentence_length):
     """ Function to generate the normalized difference of a given feature variable
 
