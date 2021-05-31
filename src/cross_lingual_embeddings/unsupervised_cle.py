@@ -1,9 +1,16 @@
-import cupy
-from src.cross_lingual_embeddings.load_monolingual import load_embedding
-from src.cross_lingual_embeddings.utils import vecmap_normalize, supports_cupy, get_cupy, topk_mean, dropout
 import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from load_monolingual import load_embedding
+from utils import vecmap_normalize, supports_cupy, get_cupy, topk_mean, dropout
 import numpy as np
 import time
+
+try:
+    import cupy
+except:
+    print("No cupy installed")
+    cupy = None
 
 
 class VecMap:
@@ -45,11 +52,11 @@ class VecMap:
 
     def __init__(self,
                  path_source_language,
-                 path_target_language):
+                 path_target_language, number_tokens=5000):
 
         # Built Embeddings
-        self.source_embedding_word, self.source_embedding_matrix = load_embedding(path_source_language)
-        self.target_embedding_word, self.target_embedding_matrix = load_embedding(path_target_language)
+        self.source_embedding_word, self.source_embedding_matrix = load_embedding(path_source_language, number_tokens)
+        self.target_embedding_word, self.target_embedding_matrix = load_embedding(path_target_language, number_tokens)
 
         # Built Index to Word map
         self.src_ind2word = {i: word for i, word in enumerate(self.source_embedding_word)}
@@ -239,8 +246,9 @@ class VecMap:
                     print('ITERATION {0} ({1:.2f}s)'.format(it, duration))
                     print('\t- Objective:        {0:9.4f}%'.format(100 * objective))
                     print('\t- Drop probability: {0:9.4f}%'.format(100 - 100 * keep_prob))
+                    t = time.time()
 
-            t = time.time()
+            
             it += 1
         if use_gpu:
             self.proj_embedding_source_target = xp.asnumpy(xw)

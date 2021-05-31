@@ -1,6 +1,9 @@
 import numpy as np
-from src.cross_lingual_embeddings.utils import normalize_matrix
-from src.cross_lingual_embeddings.load_monolingual import load_translation_dict
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from utils import normalize_matrix
+from load_monolingual import load_translation_dict
 
 
 class Evaluator():
@@ -18,7 +21,7 @@ class Evaluator():
         # Select CrossLingualModel to test
         self.CrossLingualModel = CrossLingualModel
 
-    def evaluation_on_BLI(self):
+    def evaluation_on_BLI(self, verbose=0):
         ranking = []
         iteration = 0
         norm_proj_src_emb = normalize_matrix(self.CrossLingualModel.proj_embedding_source_target)
@@ -40,7 +43,7 @@ class Evaluator():
             find_rank = np.where(most_similar_trg_index == target_index)[1][0] + 1
             ranking.append(find_rank)
 
-            if iteration <= 5:
+            if iteration <= 5 and verbose:
                 print("\nTest translation: {} -> {}".format(test_src_word,
                                                             self.CrossLingualModel.trg_ind2word[target_index]))
                 print("Predicted Top 3 Translations: {}, {}, {}".format(

@@ -1,5 +1,9 @@
-from src.cross_lingual_embeddings.load_monolingual import load_translation_dict, load_embedding
-from src.cross_lingual_embeddings.utils import normalize_matrix, check_if_neighbors_match, find_nearest_neighbor
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from load_monolingual import load_translation_dict, load_embedding
+from utils import normalize_matrix, check_if_neighbors_match, \
+find_nearest_neighbor, big_matrix_multiplication
 import numpy as np
 
 
@@ -40,12 +44,11 @@ class Projection_based_clwe:
 
     def __init__(self,
                  path_source_language, path_target_language,
-                 train_translation_dict_path
-                 ):
+                 train_translation_dict_path, number_tokens=5000):
 
         # Built Embeddings
-        self.source_embedding_word, self.source_embedding_matrix = load_embedding(path_source_language)
-        self.target_embedding_word, self.target_embedding_matrix = load_embedding(path_target_language)
+        self.source_embedding_word, self.source_embedding_matrix = load_embedding(path_source_language, number_tokens)
+        self.target_embedding_word, self.target_embedding_matrix = load_embedding(path_target_language, number_tokens)
 
         # Built train/test dictionary
         self.train_translation_source, self.train_translation_target = load_translation_dict(
@@ -63,22 +66,29 @@ class Projection_based_clwe:
         self.norm_src_embedding_matrix = normalize_matrix(self.source_embedding_matrix)
         self.norm_trg_embedding_matrix = normalize_matrix(self.target_embedding_matrix)
 
-    def proc_bootstrapping(self, n_iterations=10):
+    def proc_bootstrapping(self, growth_rate=1.5, limit=10000):
         print("Length of Original dictionary: {}".format(len(self.train_translation_source)))
-        for i in range(n_iterations):
+        size = 0
+        current_iteration = 0
+        while True:
+            current_iteration += 1
             self.get_subspace()
             self.solve_proscrutes_problem(source_to_target=True)
             self.solve_proscrutes_problem(source_to_target=False)
+
+            size1 = self.X_source_embedding.shape[0]
             # No need to augment dictionary, if its last iteration
-            if i == n_iterations - 1:
+            if size1 < 1.01 * size or size1 >= limit:
                 break
+            else:
+                size = size1
 
             # Project Source embedding to Target Embedding
             self.project_embedding_space(source_to_target=True)
             # Project Target embedding to Source Embedding
             self.project_embedding_space(source_to_target=False)
             # Start Augmenting Dictionary
-            self.augment_dictionary()
+            self.augment_dictionary(growth_rate, limit)
 
             print("Length of new dictionary: {}".format(len(self.train_translation_source)))
 
@@ -88,28 +98,29 @@ class Projection_based_clwe:
         self.solve_proscrutes_problem(source_to_target)
         self.project_embedding_space(source_to_target)
 
-    def augment_dictionary(self):
-
+    def augment_dictionary(self, growth_rate, limit):
         # Find NN from projected source to (original) target embedding
         neighbors_projected_src_trg = find_nearest_neighbor(
             normalize_matrix(self.proj_embedding_source_target),
-            self.norm_trg_embedding_matrix)
-
+            self.norm_trg_embedding_matrix, use_batch=True)
         # Find NN from projected target embedding to (original) source embedding
         neighbors_projected_trg_src = find_nearest_neighbor(
             normalize_matrix(self.proj_embedding_target_source),
-            self.norm_src_embedding_matrix)
-
+            self.norm_src_embedding_matrix, use_batch=True)
         # Find Matches
         matching = check_if_neighbors_match(neighbors_projected_src_trg,
                                             neighbors_projected_trg_src)
-
+        # Make Sure that it does not grow fast
+        rank_pairs = [[key, value] for key, value in matching.items()]
+        cnt = min(int(growth_rate * len(self.train_translation_source)), limit)
+        if cnt < len(rank_pairs):
+            rank_pairs = rank_pairs[:cnt]
         # Update orignal Dictionary
-        self.train_translation_source += [self.src_ind2word[source_index] for source_index in list(matching.keys())]
-        self.train_translation_target += [self.trg_ind2word[target_index] for target_index in list(matching.values())]
+        self.train_translation_source = [self.src_ind2word[source_index] for source_index in [pair[0] for pair in rank_pairs]]
+        self.train_translation_target = [self.trg_ind2word[target_index] for target_index in [pair[1] for pair in rank_pairs]]
 
     def get_subspace(self):
-
+        print("Length of Original dictionary: {}".format(len(self.train_translation_source)))
         index_source_embedding = []
         index_target_embedding = []
 
@@ -124,6 +135,7 @@ class Projection_based_clwe:
             index_source_embedding.append(self.src_word2ind[source_word])
             index_target_embedding.append(self.trg_word2ind[target_word])
 
+        print("Length of dictionary after pruning: {}".format(len(index_target_embedding)))
         self.X_source_embedding = self.source_embedding_matrix[index_source_embedding]
         self.X_target_embedding = self.target_embedding_matrix[index_target_embedding]
 
@@ -137,8 +149,8 @@ class Projection_based_clwe:
             self.mapping_target_source = np.matmul(U, V_t)
 
     def project_embedding_space(self, source_to_target):
-
+        
         if source_to_target:
-            self.proj_embedding_source_target = np.matmul(self.source_embedding_matrix, self.mapping_source_target)
+            self.proj_embedding_source_target = big_matrix_multiplication(self.source_embedding_matrix, self.mapping_source_target)
         else:
-            self.proj_embedding_target_source = np.matmul(self.target_embedding_matrix, self.mapping_target_source)
+            self.proj_embedding_target_source = big_matrix_multiplication(self.target_embedding_matrix, self.mapping_target_source)

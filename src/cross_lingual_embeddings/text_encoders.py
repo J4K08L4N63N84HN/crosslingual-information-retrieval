@@ -2,9 +2,11 @@ from transformers import XLMRobertaModel, XLMRobertaTokenizer
 import torch
 import numpy as np
 import tqdm.notebook as tq
+import sys
 import os
-from src.cross_lingual_embeddings.utils import normalize_matrix
-from src.cross_lingual_embeddings.load_monolingual import load_translation_dict, load_embedding
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from utils import normalize_matrix
+from load_monolingual import load_translation_dict, load_embedding
 
 
 class TextEncoders:
@@ -45,6 +47,15 @@ class TextEncoders:
 
             self.add_special_token = True
             self.pad_to_max_length = True
+
+            self.target_embedding_matrix = []
+            self.proj_embedding_source_target = []
+            self.src_word2ind = {}
+            self.trg_word2ind = {}
+            self.src_ind2word = {}
+            self.trg_ind2word = {}
+            self.norm_trg_embedding_matrix = []
+
         else:
             assert False, print("No correct model was chosen!!")
 

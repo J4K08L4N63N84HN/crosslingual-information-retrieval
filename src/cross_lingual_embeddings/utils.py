@@ -28,11 +28,15 @@ def asnumpy(x):
         return numpy.asarray(x)
 
 
-def find_nearest_neighbor(src_matrix, trg_matrix):
+def find_nearest_neighbor(src_matrix, trg_matrix, use_batch=False):
     xp = get_array_module(src_matrix)
-    matrix_mult = xp.dot(src_matrix, trg_matrix.transpose())
-    neighbors = xp.argmax(matrix_mult, axis=1).tolist()
-    neighbors = [neighbor[0] for neighbor in neighbors]
+    if use_batch:
+        neighbors = big_matrix_multiplication(src_matrix, trg_matrix.transpose(), get_max=True)
+    else:
+        matrix_mult = xp.dot(src_matrix, trg_matrix.transpose())
+        neighbors = xp.argmax(matrix_mult, axis=1).tolist()
+    if any(isinstance(i, list) for i in neighbors):
+        neighbors = [neighbor[0] for neighbor in neighbors]
     return neighbors
 
 
@@ -95,3 +99,15 @@ def dropout(m, p):
     else:
         mask = xp.random.rand(*m.shape) >= p
         return m * mask
+
+
+def big_matrix_multiplication(a, b, get_max=False, chunk_size=10000):
+    result = []
+    num_iters = a.shape[0] // chunk_size + (0 if a.shape[0] % chunk_size == 0 else 1)
+    for i in range(num_iters):
+      res_batch = numpy.dot(a[i * chunk_size : (i+1) * chunk_size, :], b)
+      if get_max:
+          res_batch = numpy.argmax(res_batch, axis=1).tolist()
+      result.extend(res_batch)
+    return result
+
