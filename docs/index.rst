@@ -1,18 +1,16 @@
-.. crosslingual-information-retrieval documentation master file, created by
-   sphinx-quickstart.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 crosslingual-information-retrieval documentation!
 ==============================================
 
-Contents:
+.. include:: ../README.rst
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :caption: Content
 
-   getting-started
-   commands
+   source/src.data
+   source/src.features
+   source/src.models
+   source/src.utils
 
 
 
