@@ -4,7 +4,7 @@ crosslingual-information-retrieval documentation!
 .. include:: ../README.rst
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Content
 
    source/src.data
