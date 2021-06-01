@@ -15,12 +15,12 @@ tqdm.pandas()
 @timer
 def cosine_similarity_vector(sentence_embedding_source_vector, sentence_embedding_target_vector):
     """ Calculate cosine similarity of sentece embeddings.
-    Args:
-        sentence_embedding_source_vector (array): Array of sentence embeddings in source language.
-        sentence_embedding_target_vector (array):Array of sentence embeddings in target language.
+        Args:
+            sentence_embedding_source_vector (array): Array of sentence embeddings in source language.
+            sentence_embedding_target_vector (array):Array of sentence embeddings in target language.
 
-    Returns:
-        array: Array containing cosine similarity measures.
+        Returns:
+            array: Array containing cosine similarity measures.
     """
     df = pd.DataFrame()
     df['sentence_embedding_source'] = sentence_embedding_source_vector
@@ -47,12 +47,13 @@ def cosine_similarity_vector(sentence_embedding_source_vector, sentence_embeddin
 @timer
 def euclidean_distance_vector(sentence_embedding_source_vector, sentence_embedding_target_vector):
     """ Calculate euclidean distance of sentece embeddings.
-    Args:
-        sentence_embedding_source_vector (array): Array of sentence embeddings in source language.
-        sentence_embedding_target_vector (array):Array of sentence embeddings in target language.
 
-    Returns:
-        array: Array containing euclidean distance measures.
+        Args:
+            sentence_embedding_source_vector (array): Array of sentence embeddings in source language.
+            sentence_embedding_target_vector (array):Array of sentence embeddings in target language.
+
+        Returns:
+            array: Array containing euclidean distance measures.
     """
 
     df = pd.DataFrame()
@@ -79,12 +80,12 @@ def euclidean_distance_vector(sentence_embedding_source_vector, sentence_embeddi
 @timer
 def word_mover_distance_vector(word_embedding_source_vector, word_embedding_target_vector):
     """ Calculate word mover distance between word embeddings of two sentences.
-    Args:
-        word_embedding_source_vector (array): Array of word embeddings of sentences in source language.
-        word_embedding_target_vector (array): Array of word embeddings of sentences in target language.
+        Args:
+            word_embedding_source_vector (array): Array of word embeddings of sentences in source language.
+            word_embedding_target_vector (array): Array of word embeddings of sentences in target language.
 
-    Returns:
-        array: Array containing word mover distance measures.
+        Returns:
+            array: Array containing word mover distance measures.
     """
     df = pd.DataFrame()
     df['word_embedding_source'] = word_embedding_source_vector
@@ -126,12 +127,12 @@ def word_mover_distance_vector(word_embedding_source_vector, word_embedding_targ
 @timer
 def jaccard(vector_source, vector_target):
     """ Calculate jaccard similarity between two list of tokens.
-    Args:
-        vector_source (array): Array of preprocessed token in source language.
-        vector_target (array): Array of preprocessed token in target language.
+        Args:
+            vector_source (array): Array of preprocessed token in source language.
+            vector_target (array): Array of preprocessed token in target language.
 
-    Returns:
-        array: Array containing jaccard similarity.
+        Returns:
+            array: Array containing jaccard similarity.
     """
     df = pd.DataFrame()
     df['original'] = vector_source
@@ -157,13 +158,13 @@ def jaccard(vector_source, vector_target):
 def embedding_difference(pca_sentence_embedding_source, pca_sentence_embedding_target, i):
     """ Calculate embedding difference for pca sentence embeddings.
 
-    Args:
-        pca_sentence_embedding_source (array): Array of pca sentence embeddings in source language.
-        pca_sentence_embedding_target (array):Array of pca sentence embeddings in target language.
-        i (int): Position in the arrays.
+        Args:
+            pca_sentence_embedding_source (array): Array of pca sentence embeddings in source language.
+            pca_sentence_embedding_target (array):Array of pca sentence embeddings in target language.
+            i (int): Position in the arrays.
 
-    Returns:
-        array: Array embedding differences.
+        Returns:
+            array: Array embedding differences.
     """
     df = pd.DataFrame()
     df['source'] = pca_sentence_embedding_source

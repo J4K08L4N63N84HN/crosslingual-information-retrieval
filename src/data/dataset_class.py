@@ -25,8 +25,8 @@ class DataSet:
     def __init__(self, preprocessed_data):
         """ Initialize class by importing preprocessed data.
 
-        Args:
-            preprocessed_data (dataframe): Preprocessed dataframe of parallel translations.
+            Args:
+                preprocessed_data (dataframe): Preprocessed dataframe of parallel translations.
         """
         self.preprocessed_dataframe = preprocessed_data
         self.model_subset = pd.DataFrame()
@@ -37,9 +37,9 @@ class DataSet:
     @timer
     def split_model_retrieval(self, n_model=20000, n_retrieval=5000):
         """ Split data into model dataset and retrieval dataset.
-        Args:
-            n_model (int): Number of preprocessed datapoints used for supervised modelling.
-            n_retrieval (int): Number of preprocessed datapoints used for the retrieval task.
+            Args:
+                n_model (int): Number of preprocessed datapoints used for supervised modelling.
+                n_retrieval (int): Number of preprocessed datapoints used for the retrieval task.
         """
         try:
             self.model_subset = self.preprocessed_dataframe.iloc[0:n_model]
@@ -50,10 +50,10 @@ class DataSet:
     @timer
     def generate_model_dataset(self, n_model=5000, k=5, sample_size_k=100):
         """ Generat dataset for modelling a supervised classifier.
-        Args:
-            n_model (int): Number of preprocessed datapoints used for supervised modelling.
-            k (int): Number of false translated sentences pair for training a supervised classifier.
-            sample_size_k (int): Number of samples from target per source sentence for searching nearest sentences.
+            Args:
+                n_model (int): Number of preprocessed datapoints used for supervised modelling.
+                k (int): Number of false translated sentences pair for training a supervised classifier.
+                sample_size_k (int): Number of samples from target per source sentence for searching nearest sentences.
         """
 
         preprocessed_source = self.model_subset.filter(regex='source$|id$', axis=1).rename(
@@ -90,8 +90,9 @@ class DataSet:
 
     @timer
     def generate_retrieval_dataset(self, n_queries):
-        """
-        n_queries (int): Number of source sentences used as queries.
+        """ Generate dataset for modelling a supervised classifier.
+            Args:
+                n_queries (int): Number of source sentences used as queries.
         """
         # Select the first n_queries since data was already sampled in the start.
         query = self.retrieval_subset.filter(regex='source$|id$', axis=1).iloc[:n_queries].rename(
