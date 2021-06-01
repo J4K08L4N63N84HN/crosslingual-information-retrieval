@@ -28,10 +28,10 @@ class PreprocessingEuroParl:
     def __init__(self, df_sampled_path="../data/interim/europarl_english_german.pkl"):
         """ Initialize dataframe by importing europarl data for source and target
 
-        Args:
-            sentence_data_source (str): Path of the europarl source dataset
-            sentence_data_target (str): Path of the europarl target dataset
-            number_datapoints (int): Size of the sample of the europarl dataset
+            Args:
+                sentence_data_source (str): Path of the europarl source dataset
+                sentence_data_target (str): Path of the europarl target dataset
+                number_datapoints (int): Size of the sample of the europarl dataset
         """
         self.dataframe = import_data(df_sampled_path)
         self.punctuation_list = list(string.punctuation)
@@ -46,17 +46,17 @@ class PreprocessingEuroParl:
                              number_pc):
         """ Preprocess the source sentence dataset
 
-        Args:
-            stopwords_source (list): List of stopwords to remove and count
-            nlp_source (spacy pipeline): Spacy pipeline for preprocessing
-            textblob_source (textblob object): Textblob object for sentiment analysis
-            embedding_array_source_path (str): Path to embedding array
-            embedding_dictionary_source_path (str): Path to embedding dictionary
-            stopwords_target (list): List of stopwords to remove and count
-            nlp_target (spacy pipeline): Spacy pipeline for preprocessing
-            textblob_target (textblob object): Textblob object for sentiment analysis
-            embedding_array_target_path (str): Path to embedding array
-            embedding_dictionary_target_path (str): Path to embedding dictionary
+            Args:
+                stopwords_source (list): List of stopwords to remove and count
+                nlp_source (spacy pipeline): Spacy pipeline for preprocessing
+                textblob_source (textblob object): Textblob object for sentiment analysis
+                embedding_array_source_path (str): Path to embedding array
+                embedding_dictionary_source_path (str): Path to embedding dictionary
+                stopwords_target (list): List of stopwords to remove and count
+                nlp_target (spacy pipeline): Spacy pipeline for preprocessing
+                textblob_target (textblob object): Textblob object for sentiment analysis
+                embedding_array_target_path (str): Path to embedding array
+                embedding_dictionary_target_path (str): Path to embedding dictionary
         """
         self.preprocessed["id"] = self.dataframe["id"]
         self.preprocessed["token_preprocessed_embedding_source"] = create_cleaned_token_embedding((self.dataframe[

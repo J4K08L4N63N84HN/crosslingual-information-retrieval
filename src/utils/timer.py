@@ -8,8 +8,12 @@ import functools
 
 def timer(function):
     """ Function to show time neeed for the evaluation of a function.
-    Args:
-        function (function): Function that is executed.
+
+        Args:
+            function (function): Function that is executed.
+
+        Returns:
+            result (object): Result of the executed function.
     """
     @functools.wraps(function)
     def time_measurement(*args, **kwargs):

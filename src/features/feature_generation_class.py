@@ -22,9 +22,9 @@ class FeatureGeneration:
     def __init__(self, dataset, k):
         """ Initialize dataframe by importing preprocessed dataset..
 
-        Args:
-            dataset (str): Path of the europarl source dataset.
-            k (int): Number of principal components.
+            Args:
+                dataset (str): Path of the europarl source dataset.
+                k (int): Number of principal components.
         """
         self.preprocessed_dataset = dataset
         self.feature_dataframe = pd.DataFrame()
