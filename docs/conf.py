@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.abspath('./..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'animate_logos'
+project = 'crosslingual-information-retrieval'
 copyright = '2021, Min Duc Bui, Jakob Langenbahn, Niklas Sabel'
 author = 'Min Duc Bui, Jakob Langenbahn, Niklas Sabel'
 
