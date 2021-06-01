@@ -9,4 +9,4 @@
     :members:
 """
 
-from src.data.import_data import create_data_subset, import_data
+from .import_data import create_data_subset, import_data
