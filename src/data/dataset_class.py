@@ -37,6 +37,7 @@ class DataSet:
     @timer
     def split_model_retrieval(self, n_model=20000, n_retrieval=5000):
         """ Split data into model dataset and retrieval dataset.
+
             Args:
                 n_model (int): Number of preprocessed datapoints used for supervised modelling.
                 n_retrieval (int): Number of preprocessed datapoints used for the retrieval task.
@@ -49,7 +50,8 @@ class DataSet:
 
     @timer
     def generate_model_dataset(self, n_model=5000, k=5, sample_size_k=100):
-        """ Generat dataset for modelling a supervised classifier.
+        """ Generate dataset for modelling a supervised classifier.
+
             Args:
                 n_model (int): Number of preprocessed datapoints used for supervised modelling.
                 k (int): Number of false translated sentences pair for training a supervised classifier.
@@ -91,6 +93,7 @@ class DataSet:
     @timer
     def generate_retrieval_dataset(self, n_queries):
         """ Generate dataset for modelling a supervised classifier.
+
             Args:
                 n_queries (int): Number of source sentences used as queries.
         """
