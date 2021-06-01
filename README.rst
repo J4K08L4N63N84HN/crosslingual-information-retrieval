@@ -56,7 +56,7 @@ Detailed documentation and usage instructions can be found `here <https://crossl
 Credits
 #######
 
-The project started in March 2020 as a Information Retrieval project at the University of Mannheim. The project team consists of:
+The project started in March 2021 as a Information Retrieval project at the University of Mannheim. The project team consists of:
 
 * `Minh Duc Bui <https://github.com/MinhDucBui/>`__
 * `Jakob Langenbahn <https://github.com/J4K08L4N63N84HN/>`__
