@@ -1,5 +1,5 @@
 Feature Generation
-=======
+==================
 
 .. automodule:: src.features
    :members:
