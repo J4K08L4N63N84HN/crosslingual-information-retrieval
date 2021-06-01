@@ -1,4 +1,4 @@
-""" Function to show time neeed for the evaluation of a funciton.
+""" Function to show time neeed for the evaluation of a function.
 """
 
 import time
@@ -7,7 +7,9 @@ import functools
 
 
 def timer(function):
-    """ Function to show time neeed for the evaluation of a funciton.
+    """ Function to show time neeed for the evaluation of a function.
+    Args:
+        function (function): Function that is executed.
     """
     @functools.wraps(function)
     def time_measurement(*args, **kwargs):
