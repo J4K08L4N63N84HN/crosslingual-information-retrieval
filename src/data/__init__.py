@@ -8,3 +8,5 @@
 .. automodule:: src.data.dataset_class
     :members:
 """
+
+from src.data.import_data import create_data_subset, import_data
