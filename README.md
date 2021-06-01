@@ -1,1 +1,0 @@
-# crosslingual-information-retrieval
