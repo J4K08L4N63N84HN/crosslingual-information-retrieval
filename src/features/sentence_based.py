@@ -1,31 +1,21 @@
-""" Functions to generate the following sentence based features:
-- Total number of punctuation marks
-- Count of different punctuation marks
-- Number of words
-- Number of unique words
-- Number characters
-- Number of different POS tags
-- Number of different times
-- Number of different Named Entities
-- Number of Stopwords
-- Sentiment Analysis
-
+""" Functions to generate features based on preprocessed sentece informations.
 """
 
 import numpy as np
-from src.data.preprocess_data import timer
+
+from src.utils.timer import timer
 
 
 @timer
 def difference_numerical(source_array, target_array):
-    """ Function to generate the difference of a given feature variable
+    """ Function to generate the difference of a given feature variable.
 
            Args:
-               source_array (numpy.array): feature array describing source language
-               target_array (numpy.array): feature array describing target language
+               source_array (numpy.array): feature array describing source language.
+               target_array (numpy.array): feature array describing target language.
 
            Returns:
-               numpy.array: Array containing the differences
+               numpy.array: Array containing the differences.
 
            """
 
@@ -34,14 +24,14 @@ def difference_numerical(source_array, target_array):
 
 @timer
 def relative_difference_numerical(source_array, target_array):
-    """ Function to generate the relative difference of a given feature variable
+    """ Function to generate the relative difference of a given feature variable.
 
                Args:
-                   source_array (numpy.array): feature array describing source language
-                   target_array (numpy.array): feature array describing target language
+                   source_array (numpy.array): feature array describing source language.
+                   target_array (numpy.array): feature array describing target language.
 
                Returns:
-                   numpy.array: Array containing the relative differences
+                   numpy.array: Array containing the relative differences.
 
                """
 
@@ -50,17 +40,22 @@ def relative_difference_numerical(source_array, target_array):
 
 @timer
 def normalized_difference_numerical(source_array, target_array, source_sentence_length, target_sentence_length):
-    """ Function to generate the normalized difference of a given feature variable
+    """ Function to generate the normalized difference of a given feature variable.
 
                    Args:
-                       source_array (numpy.array): feature array describing source language
-                       target_array (numpy.array): feature array describing target language
-                       source_sentence_length (numpy.array): array describing the length of a feature sentence in source
-                       target_sentence_length (numpy.array): array describing the length of a feature sentence in target
+                       source_array (numpy.array): feature array describing source language.
+                       target_array (numpy.array): feature array describing target language.
+                       source_sentence_length (numpy.array): array describing the length of a feature sentence in
+                       source.
+                       target_sentence_length (numpy.array): array describing the length of a feature sentence in
+                       target.
 
                    Returns:
-                       numpy.array: Array containing the normalized differences
+                       numpy.array: Array containing the normalized differences.
 
                    """
 
-    return ((source_array / source_sentence_length) - (target_array / target_sentence_length)).replace(np.nan, 0).replace(np.inf, 0).replace(np.log(0), 0)
+    return ((source_array / source_sentence_length) - (target_array / target_sentence_length)).replace(
+        np.nan, 0).replace(
+        np.inf, 0).replace(
+        np.log(0), 0)
