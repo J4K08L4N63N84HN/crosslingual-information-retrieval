@@ -1,5 +1,5 @@
-crosslingual-information-retrieval documentation!
-==============================================
+.. crosslingual-information-retrieval documentation master file
+
 
 .. include:: ../README.rst
 
