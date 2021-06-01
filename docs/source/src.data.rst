@@ -1,5 +1,5 @@
 Data Import and Preprocessing
-==============================
+=============================
 
 .. automodule:: src.data
    :members:
