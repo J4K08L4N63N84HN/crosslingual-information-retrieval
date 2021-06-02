@@ -1,7 +1,5 @@
 .. crosslingual-information-retrieval documentation master file
-$ sphinx-apidoc -F -o doc/ src/my_project/
-$ cd doc
-$ make html
+
 .. include:: ../README.rst
 
 .. toctree::
