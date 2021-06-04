@@ -36,7 +36,7 @@ def create_data_subset(sentence_data_source_path='../data/external/europarl-v7.d
         Args:
             sentence_data_source_path (string): Path to europarl data from source language.
             sentence_data_target_path (string): Path to europarl data from target language.
-            sample_size (int): Size of sample subset.
+            sample_size (integer): Size of sample subset.
             sentence_data_sampled_path (string): Path where to save pickle containing sampled parallel data.
         """
     doc_source = load_doc(sentence_data_source_path)
