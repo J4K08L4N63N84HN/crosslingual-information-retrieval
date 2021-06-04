@@ -16,7 +16,6 @@ def MAP_score(source_id, target_labels, prediction):
     result = pd.DataFrame()
     result['source_id'] = source_id
     result['Translation'] = target_labels
-    result = pd.concat([source_id, target_labels], axis=1)
     result['probabilities'] = [x[1] for x in prediction]
     # rank by the source_id and get the ranking for each of the queries for all the documents
     result['rank'] = result.groupby('source_id')['probabilities'].rank(method='min', ascending=False)
