@@ -27,3 +27,46 @@ def MAP_score(source_id, target_labels, prediction):
         sum_inverse += 1 / ranks['rank'][i]
     MAP = 1 / len(ranks) * sum_inverse
     return MAP
+
+
+def feature_selection(model, scaler, trainset, testset, starting_features, added_features):
+    """
+    Args:
+            model (ML model): Initialised model to fit the data.
+            scaler (ML scaler): Scaler to scale our feature into a given range.
+            trainset (dataframe): Dataframe containing our training data.
+            testset (dataframe): Dataframe containing our testing data.
+            starting_features (array): Array containing the starting features for our first training.
+            added_features (array): Array containing the features to be added for further training.
+
+    """
+    # get the first features to train (embedding features)
+    target_train = trainset['Translation']
+    target_test = testset['Translation']
+    data_train = trainset.filter(items=starting_features)
+    data_test = testset.filter(items=starting_features)
+    # scale the features
+    data_train[data_train.columns] = scaler.fit_transform(data_train[data_train.columns])
+    data_test[data_test.columns] = scaler.transform(data_test[data_test.columns])
+    # fit the model and get the initial MapScore
+    modelfit = model.fit(data_train, target_train)
+    prediction = modelfit.predict_proba(data_test)
+    MapScore = MAP_score(testset['source_id'], target_test, prediction)
+    print("The initial MAP score on test set: {:.4f}".format(MapScore))
+    # iterate through all other features and add them if they improve the MapScore
+    for feature in added_features:
+        data_train = trainset.filter(items=starting_features)
+        data_test = testset.filter(items=starting_features)
+        data_train[feature] = trainset[feature].tolist()
+        data_test[feature] = testset[feature].tolist()
+        data_train[data_train.columns] = scaler.fit_transform(data_train[data_train.columns])
+        data_test[data_test.columns] = scaler.transform(data_test[data_test.columns])
+        modelfit = model.fit(data_train, target_train)
+        prediction = modelfit.predict_proba(data_test)
+        print("With {} added, the MAP score on test set: {:.4f}".format(feature,
+                                                                        MAP_score(testset['source_id'], target_test,
+                                                                                  prediction)))
+        if MAP_score(testset['source_id'], target_test, prediction) > MapScore:
+            starting_features.append(feature)
+            MapScore = MAP_score(testset['source_id'], target_test, prediction)
+            print("Updated MAP score on test set with new feature {}: {:.4f}".format(feature, MapScore))
