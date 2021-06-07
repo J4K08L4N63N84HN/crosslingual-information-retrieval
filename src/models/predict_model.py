@@ -28,6 +28,8 @@ def MAP_score(source_id, target_labels, prediction):
         sum_inverse += 1 / ranks['rank'][i]
     MAP = 1 / len(ranks) * sum_inverse
     return MAP
+    
+    
 
 
 def feature_selection(model, scaler, trainset, testset, starting_features, added_features):
@@ -50,23 +52,23 @@ def feature_selection(model, scaler, trainset, testset, starting_features, added
     data_train[data_train.columns] = scaler.fit_transform(data_train[data_train.columns])
     data_test[data_test.columns] = scaler.transform(data_test[data_test.columns])
     # fit the model and get the initial MapScore
-    modelfit = model.fit(data_train, target_train)
-    prediction = modelfit.predict_proba(data_test)
+    modelfit = model.fit(data_train.to_numpy(), target_train.to_numpy())
+    prediction = modelfit.predict_proba(data_test.to_numpy())
     MapScore = MAP_score(testset['source_id'], target_test, prediction)
     print("The initial MAP score on test set: {:.4f}".format(MapScore))
     # iterate through all other features and add them if they improve the MapScore
-    for feature in added_features:
+    for feature in added_features[::-1]:
         data_train = trainset.filter(items=starting_features)
         data_test = testset.filter(items=starting_features)
         data_train[feature] = trainset[feature].tolist()
         data_test[feature] = testset[feature].tolist()
         data_train[data_train.columns] = scaler.fit_transform(data_train[data_train.columns])
         data_test[data_test.columns] = scaler.transform(data_test[data_test.columns])
-        modelfit = model.fit(data_train, target_train)
-        prediction = modelfit.predict_proba(data_test)
-        print("With {} added, the MAP score on test set: {:.4f}".format(feature,
-                                                                        MAP_score(testset['source_id'], target_test,
-                                                                                  prediction)))
+        modelfit = model.fit(data_train.to_numpy(), target_train.to_numpy())
+        prediction = modelfit.predict_proba(data_test.to_numpy())
+        #print("With {} added, the MAP score on test set: {:.4f}".format(feature,
+        #                                                                MAP_score(testset['source_id'], target_test,
+                                                                                  #prediction)))
         if MAP_score(testset['source_id'], target_test, prediction) > MapScore:
             starting_features.append(feature)
             MapScore = MAP_score(testset['source_id'], target_test, prediction)
