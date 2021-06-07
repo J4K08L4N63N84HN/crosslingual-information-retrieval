@@ -31,9 +31,41 @@ def MAP_score(source_id, target_labels, prediction):
     return MAP
     
     
+def pipeline_model_optimization(model, parameter_grid, scaler, trainset, testset, starting_features, added_features, threshold_map_feature_selection=0.001):
+    
+    print("-----------------First do Forward Selection-----------------")
+    forward_selection(model, scaler, trainset, testset, starting_features, added_features, threshold_map_feature_selection)
+    
+    target_train=trainset['Translation'].astype(float)
+    data_train=trainset.loc[:, starting_features]
+    target_test=testset['Translation'].astype(float)
+    data_test=testset.loc[:, starting_features]
+
+    data_train.loc[:, data_train.columns] = scaler.fit_transform(data_train.loc[:, data_train.columns])
+    data_test.loc[:, data_test.columns] = scaler.transform(data_test.loc[:, data_test.columns])
+    
+    print("\n\n-----------------Start Hyperparameter-tuning with Grid Search-----------------")
+    best_parameter_combination, best_map_score, all_parameter_combination = grid_search_hyperparameter_tuning(parameter_grid, model, data_train, target_train, data_test, testset)
+    
+    return starting_features, best_parameter_combination, best_map_score, all_parameter_combination
+    
+    
+def forward_selection(model, scaler, trainset, testset, starting_features, added_features, threshold_map_feature_selection):
+    length_current_start_feature = len(starting_features)
+    index = 1
+    map_score = 0
+    while True:
+        print("\nCurrent Iteration through feature list: {}".format(index))
+        map_score = feature_selection(model, scaler, trainset, testset, starting_features, added_features, threshold_map_feature_selection)
+        if length_current_start_feature >= len(starting_features):
+            break
+        length_current_start_feature = len(starting_features)
+        index += 1
+    print("\n-----------------Result of Feature Selection-----------------")
+    print("\nBest MAP Score after feature selection: {}".format(map_score))
 
 
-def feature_selection(model, scaler, trainset, testset, starting_features, added_features):
+def feature_selection(model, scaler, trainset, testset, starting_features, added_features, threshold_map_feature_selection=0.001):
     """
     Args:
             model (ML model): Initialised model to fit the data.
@@ -70,11 +102,12 @@ def feature_selection(model, scaler, trainset, testset, starting_features, added
         #print("With {} added, the MAP score on test set: {:.4f}".format(feature,
         #                                                                MAP_score(testset['source_id'], target_test,
                                                                                   #prediction)))
-        if MAP_score(testset['source_id'], target_test, prediction) > MapScore:
+                                                        
+        if MAP_score(testset['source_id'], target_test, prediction) > MapScore+threshold_map_feature_selection:
             starting_features.append(feature)
             MapScore = MAP_score(testset['source_id'], target_test, prediction)
             print("Updated MAP score on test set with new feature {}: {:.4f}".format(feature, MapScore))
-
+    return MapScore
 
 def threshold_counts(s, threshold=0):
     counts = s.value_counts(normalize=True, dropna=False)
@@ -83,14 +116,14 @@ def threshold_counts(s, threshold=0):
     return True
 
 
-def grid_search_hyperparameter_tuning(parameter_grid, model, data_train, data_test, original_retrieval_dataset):
+def grid_search_hyperparameter_tuning(parameter_grid, model, data_train, target_train, data_test, original_retrieval_dataset):
     keys, values = zip(*parameter_grid.items())
     all_parameter_combination = [dict(zip(keys, v)) for v in itertools.product(*values)]
 
     print("Number of Parameter Combinations: {}".format(len(all_parameter_combination)))
     
     for parameter_combination in all_parameter_combination:
-        print("Current Hyperpamaters: {}".format(parameter_combination))
+        print("\nCurrent Hyperpamaters: {}".format(parameter_combination))
         model.__init__(**parameter_combination)
         # fit the model and get the initial MapScore
         modelfit = model.fit(data_train.to_numpy(), target_train.to_numpy())
@@ -103,6 +136,7 @@ def grid_search_hyperparameter_tuning(parameter_grid, model, data_train, data_te
     best_parameter_combination = all_parameter_combination[best_parameter_combination_index]
     best_map_score = best_parameter_combination["MAP_score"]
     best_parameter_combination.pop('MAP_score', None)
+    print("\n-----------------Result of Hyperparameter Tuning-----------------")
     print("\nBest Hyperamater Settting: {}".format(best_parameter_combination))
     print("With MAP Score: {:.4f}".format(best_map_score))
     return best_parameter_combination, best_map_score, all_parameter_combination
