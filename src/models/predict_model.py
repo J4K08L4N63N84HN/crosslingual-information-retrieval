@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.utils import shuffle
+import itertools
 
 def MAP_score(source_id, target_labels, prediction):
     """ Function to compute the Mean Average Precision score of a given ranking.
@@ -80,6 +81,31 @@ def threshold_counts(s, threshold=0):
     if (counts >= threshold).any():
         return False
     return True
+
+
+def grid_search_hyperparameter_tuning(parameter_grid, model, data_train, data_test, original_retrieval_dataset):
+    keys, values = zip(*parameter_grid.items())
+    all_parameter_combination = [dict(zip(keys, v)) for v in itertools.product(*values)]
+
+    print("Number of Parameter Combinations: {}".format(len(all_parameter_combination)))
+    
+    for parameter_combination in all_parameter_combination:
+        print("Current Hyperpamaters: {}".format(parameter_combination))
+        model.__init__(**parameter_combination)
+        # fit the model and get the initial MapScore
+        modelfit = model.fit(data_train.to_numpy(), target_train.to_numpy())
+        prediction = modelfit.predict_proba(data_test.to_numpy())
+        MapScore = MAP_score(original_retrieval_dataset['source_id'], original_retrieval_dataset["Translation"], prediction)
+        print("MAP score on test set with current hyperpamaters: {:.4f}".format(MapScore))
+        parameter_combination["MAP_score"] = MapScore
+    
+    best_parameter_combination_index = np.argmax([sublist["MAP_score"] for sublist in all_parameter_combination])
+    best_parameter_combination = all_parameter_combination[best_parameter_combination_index]
+    best_map_score = best_parameter_combination["MAP_score"]
+    best_parameter_combination.pop('MAP_score', None)
+    print("\nBest Hyperamater Settting: {}".format(best_parameter_combination))
+    print("With MAP Score: {:.4f}".format(best_map_score))
+    return best_parameter_combination, best_map_score, all_parameter_combination
     
 
 def downsample(imbalanced_data):
