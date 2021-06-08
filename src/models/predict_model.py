@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.utils import shuffle
 import itertools
 
+
 def MAP_score(source_id, target_labels, prediction):
     """ Function to compute the Mean Average Precision score of a given ranking.
 
@@ -29,34 +30,38 @@ def MAP_score(source_id, target_labels, prediction):
         sum_inverse += 1 / ranks['rank'][i]
     MAP = 1 / len(ranks) * sum_inverse
     return MAP
-    
-    
-def pipeline_model_optimization(model, parameter_grid, scaler, trainset, testset, starting_features, added_features, threshold_map_feature_selection=0.001):
-    
+
+
+def pipeline_model_optimization(model, parameter_grid, scaler, trainset, testset, starting_features, added_features,
+                                threshold_map_feature_selection=0.001):
     print("-----------------First do Forward Selection-----------------")
-    forward_selection(model, scaler, trainset, testset, starting_features, added_features, threshold_map_feature_selection)
-    
-    target_train=trainset['Translation'].astype(float)
-    data_train=trainset.loc[:, starting_features]
-    target_test=testset['Translation'].astype(float)
-    data_test=testset.loc[:, starting_features]
+    forward_selection(model, scaler, trainset, testset, starting_features, added_features,
+                      threshold_map_feature_selection)
+
+    target_train = trainset['Translation'].astype(float)
+    data_train = trainset.loc[:, starting_features]
+    target_test = testset['Translation'].astype(float)
+    data_test = testset.loc[:, starting_features]
 
     data_train.loc[:, data_train.columns] = scaler.fit_transform(data_train.loc[:, data_train.columns])
     data_test.loc[:, data_test.columns] = scaler.transform(data_test.loc[:, data_test.columns])
-    
+
     print("\n\n-----------------Start Hyperparameter-tuning with Grid Search-----------------")
-    best_parameter_combination, best_map_score, all_parameter_combination = grid_search_hyperparameter_tuning(parameter_grid, model, data_train, target_train, data_test, testset)
-    
+    best_parameter_combination, best_map_score, all_parameter_combination = grid_search_hyperparameter_tuning(
+        parameter_grid, model, data_train, target_train, data_test, testset)
+
     return starting_features, best_parameter_combination, best_map_score, all_parameter_combination
-    
-    
-def forward_selection(model, scaler, trainset, testset, starting_features, added_features, threshold_map_feature_selection):
+
+
+def forward_selection(model, scaler, trainset, testset, starting_features, added_features,
+                      threshold_map_feature_selection):
     length_current_start_feature = len(starting_features)
     index = 1
     map_score = 0
     while True:
         print("\nCurrent Iteration through feature list: {}".format(index))
-        map_score = feature_selection(model, scaler, trainset, testset, starting_features, added_features, threshold_map_feature_selection)
+        map_score = feature_selection(model, scaler, trainset, testset, starting_features, added_features,
+                                      threshold_map_feature_selection)
         if length_current_start_feature >= len(starting_features):
             break
         length_current_start_feature = len(starting_features)
@@ -65,7 +70,8 @@ def forward_selection(model, scaler, trainset, testset, starting_features, added
     print("\nBest MAP Score after feature selection: {}".format(map_score))
 
 
-def feature_selection(model, scaler, trainset, testset, starting_features, added_features, threshold_map_feature_selection=0.001):
+def feature_selection(model, scaler, trainset, testset, starting_features, added_features,
+                      threshold_map_feature_selection=0.001):
     """
     Args:
             model (ML model): Initialised model to fit the data.
@@ -99,15 +105,17 @@ def feature_selection(model, scaler, trainset, testset, starting_features, added
         data_test[data_test.columns] = scaler.transform(data_test[data_test.columns])
         modelfit = model.fit(data_train.to_numpy(), target_train.to_numpy())
         prediction = modelfit.predict_proba(data_test.to_numpy())
-        #print("With {} added, the MAP score on test set: {:.4f}".format(feature,
+        # print("With {} added, the MAP score on test set: {:.4f}".format(feature,
         #                                                                MAP_score(testset['source_id'], target_test,
-                                                                                  #prediction)))
-                                                        
-        if MAP_score(testset['source_id'], target_test, prediction) > MapScore+threshold_map_feature_selection:
+        # prediction)))
+
+        if MAP_score(testset['source_id'], target_test, prediction) > MapScore + threshold_map_feature_selection:
             starting_features.append(feature)
+            added_features.drop(feature)
             MapScore = MAP_score(testset['source_id'], target_test, prediction)
             print("Updated MAP score on test set with new feature {}: {:.4f}".format(feature, MapScore))
     return MapScore
+
 
 def threshold_counts(s, threshold=0):
     counts = s.value_counts(normalize=True, dropna=False)
@@ -116,22 +124,28 @@ def threshold_counts(s, threshold=0):
     return True
 
 
-def grid_search_hyperparameter_tuning(parameter_grid, model, data_train, target_train, data_test, original_retrieval_dataset):
+def grid_search_hyperparameter_tuning(parameter_grid, model, data_train, target_train, data_test,
+                                      original_retrieval_dataset):
     keys, values = zip(*parameter_grid.items())
     all_parameter_combination = [dict(zip(keys, v)) for v in itertools.product(*values)]
 
     print("Number of Parameter Combinations: {}".format(len(all_parameter_combination)))
-    
+
     for parameter_combination in all_parameter_combination:
         print("\nCurrent Hyperpamaters: {}".format(parameter_combination))
         model.__init__(**parameter_combination)
         # fit the model and get the initial MapScore
-        modelfit = model.fit(data_train.to_numpy(), target_train.to_numpy())
+        try:
+            modelfit = model.fit(data_train.to_numpy(), target_train.to_numpy())
+        except:
+            print('Mistake')
+            continue
         prediction = modelfit.predict_proba(data_test.to_numpy())
-        MapScore = MAP_score(original_retrieval_dataset['source_id'], original_retrieval_dataset["Translation"], prediction)
+        MapScore = MAP_score(original_retrieval_dataset['source_id'], original_retrieval_dataset["Translation"],
+                             prediction)
         print("MAP score on test set with current hyperpamaters: {:.4f}".format(MapScore))
-        parameter_combination["MAP_score"] = MapScore
-    
+        parameter_combination["MAP_score"] = 0
+
     best_parameter_combination_index = np.argmax([sublist["MAP_score"] for sublist in all_parameter_combination])
     best_parameter_combination = all_parameter_combination[best_parameter_combination_index]
     best_map_score = best_parameter_combination["MAP_score"]
@@ -140,12 +154,12 @@ def grid_search_hyperparameter_tuning(parameter_grid, model, data_train, target_
     print("\nBest Hyperamater Settting: {}".format(best_parameter_combination))
     print("With MAP Score: {:.4f}".format(best_map_score))
     return best_parameter_combination, best_map_score, all_parameter_combination
-    
+
 
 def downsample(imbalanced_data):
     y = imbalanced_data["Translation"].astype(int)
     y = np.where((y == 0), 0, 1)
-    
+
     # Indicies of each class' observations
     i_class0 = np.where(y == 0)[0]
     i_class1 = np.where(y == 1)[0]
@@ -164,4 +178,3 @@ def downsample(imbalanced_data):
     index_balanced = i_class0_downsampled.tolist() + i_class1.tolist()
     index_balanced = shuffle(index_balanced, random_state=42)
     return imbalanced_data.iloc[index_balanced, :]
-            
