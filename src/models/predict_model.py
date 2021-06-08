@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.utils import shuffle
 import itertools
+from tqdm import tqdm
 
 
 def MAP_score(source_id, target_labels, prediction):
@@ -111,7 +112,6 @@ def feature_selection(model, scaler, trainset, testset, starting_features, added
 
         if MAP_score(testset['source_id'], target_test, prediction) > MapScore + threshold_map_feature_selection:
             starting_features.append(feature)
-            added_features.drop(feature)
             MapScore = MAP_score(testset['source_id'], target_test, prediction)
             print("Updated MAP score on test set with new feature {}: {:.4f}".format(feature, MapScore))
     return MapScore
@@ -126,25 +126,32 @@ def threshold_counts(s, threshold=0):
 
 def grid_search_hyperparameter_tuning(parameter_grid, model, data_train, target_train, data_test,
                                       original_retrieval_dataset):
+    if len(parameter_grid) == 0:
+        return None, None, None
+
     keys, values = zip(*parameter_grid.items())
     all_parameter_combination = [dict(zip(keys, v)) for v in itertools.product(*values)]
 
     print("Number of Parameter Combinations: {}".format(len(all_parameter_combination)))
-
-    for parameter_combination in all_parameter_combination:
-        print("\nCurrent Hyperpamaters: {}".format(parameter_combination))
+    current_best_map_score = 0
+    for parameter_combination in tqdm(all_parameter_combination, desc="Hyperparameter Tuning",
+                                      total=len(all_parameter_combination)):
+        # print("\nCurrent Hyperpamaters: {}".format(parameter_combination))
         model.__init__(**parameter_combination)
         # fit the model and get the initial MapScore
         try:
             modelfit = model.fit(data_train.to_numpy(), target_train.to_numpy())
+            prediction = modelfit.predict_proba(data_test.to_numpy())
+            MapScore = MAP_score(original_retrieval_dataset['source_id'], original_retrieval_dataset["Translation"],
+                                 prediction)
         except:
-            print('Mistake')
-            continue
-        prediction = modelfit.predict_proba(data_test.to_numpy())
-        MapScore = MAP_score(original_retrieval_dataset['source_id'], original_retrieval_dataset["Translation"],
-                             prediction)
-        print("MAP score on test set with current hyperpamaters: {:.4f}".format(MapScore))
-        parameter_combination["MAP_score"] = 0
+            print("Model failed to fit")
+            MapScore = 0
+        parameter_combination["MAP_score"] = MapScore
+        if current_best_map_score < MapScore:
+            print("\nCurrent Best Hyperpamaters: {}".format(parameter_combination))
+            print("With Map Score {:.4f}".format(MapScore))
+            current_best_map_score = MapScore
 
     best_parameter_combination_index = np.argmax([sublist["MAP_score"] for sublist in all_parameter_combination])
     best_parameter_combination = all_parameter_combination[best_parameter_combination_index]
