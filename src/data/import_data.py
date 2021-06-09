@@ -51,7 +51,8 @@ def create_data_subset(sentence_data_source_path='../data/external/europarl-v7.d
     df_not_empty = df.loc[not_empty_sentence_index]
 
     df_sampled = df_not_empty.sample(sample_size, random_state=42).reset_index(drop=True).reset_index().rename(
-        columns={"index": "id"})
+        columns={"index": "id_source"})
+    df_sampled["id_target"] = df_sampled["id_source"]
     df_sampled.to_pickle(sentence_data_sampled_path)
     print("Sampled dataframe saved in: " + sentence_data_sampled_path)
 
