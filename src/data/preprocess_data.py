@@ -7,7 +7,7 @@ import string
 
 import numpy as np
 import pandas as pd
-from nltk.tokenize import word_tokenize
+from nltk import word_tokenize
 from sklearn.decomposition import PCA
 from sklearn.feature_extraction.text import TfidfVectorizer
 from tqdm import tqdm
@@ -16,9 +16,30 @@ from src.utils.timer import timer
 
 tqdm.pandas()
 
+@timer
+def tokenize_sentence(sentence_vector):
+    """ Function to tokenize an array of sentences.
+       Args:
+           sentence_vector (numpy.array): Array containing text.
+       Returns:
+           numpy.array: Array containing the individual tokens of the input sentence.
+    """
+    return sentence_vector.progress_apply(lambda sentence: word_tokenize(sentence))
+
 
 @timer
-def lemmatize(sentence_vector, nlp_language):
+def strip_whitespace(token_vector):
+    """ Function to strip whitespaces of an array of sentences.
+        Args:
+            token_vector (numpy.array): Array containing text.
+        Returns:
+            numpy.array: Array containing the individual tokens of the input sentence without possible whitespaces.
+    """
+    return token_vector.progress_apply(lambda word: list(map(str.strip, word)))
+
+
+@timer
+def spacy(sentence_vector, nlp_language):
     """ Function to lemmatize an array of sentences.
 
         Args:
@@ -29,37 +50,51 @@ def lemmatize(sentence_vector, nlp_language):
             numpy.array: Array containing the lemmatized words.
     """
     lemmatizer_language = nlp_language.get_pipe("lemmatizer")
-    return sentence_vector.progress_apply(lambda sentence: " ".join([token.lemma_ for token in nlp_language(sentence)]))
+    return sentence_vector.progress_apply(lambda sentence:
+        [token for token in nlp_language(sentence)])
 
 
 @timer
-def tokenize_sentence(sentence_vector):
-    """ Function to tokenize an array of sentences.
-
-       Args:
-           sentence_vector (numpy.array): Array containing text.
-
-       Returns:
-           numpy.array: Array containing the individual tokens of the input sentence.
-    """
-    return sentence_vector.progress_apply(lambda sentence: word_tokenize(sentence))
-
-
-@timer
-def strip_whitespace(token_vector):
-    """ Function to strip whitespaces of an array of sentences.
+def remove_stopwords(token_vector):
+    """ Function to remove stopwords out of an array of sentences.
 
         Args:
             token_vector (numpy.array): Array containing text.
+            stopwords_language (list): List of stopwords in a specific language.
 
         Returns:
-            numpy.array: Array containing the individual tokens of the input sentence without possible whitespaces.
+            numpy.array: Array containing tokenized sentence removed stopwords.
     """
-    return token_vector.progress_apply(lambda word: list(map(str.strip, word)))
+    return token_vector.progress_apply(lambda token_list: [word for word in token_list if not word.is_stop])
+
+
+@timer
+def lemmatize(sentence_vector):
+    """ Function to lemmatize an array of sentences.
+
+        Args:
+            sentence_vector (array): Array containing text.
+            nlp_language (object): Spacy pipeline.
+
+        Returns:
+            numpy.array: Array containing the lemmatized words.
+    """
+    return sentence_vector.progress_apply(lambda token_list:
+        [token.lemma_ for token in token_list])
 
 
 @timer
 def lowercase(token_vector):
+    """ Function to lowercase an array of sentences.
+        Args:
+            token_vector (numpy.array): Array containing tokenized sentence.
+        Returns:
+            numpy.array: Array containing tokenized, lowercased sentence.
+    """
+    return token_vector.progress_apply(lambda row: list(map(str.lower, row)))
+
+@timer
+def lowercase_spacy(token_vector):
     """ Function to lowercase an array of sentences.
 
         Args:
@@ -68,7 +103,7 @@ def lowercase(token_vector):
         Returns:
             numpy.array: Array containing tokenized, lowercased sentence.
     """
-    return token_vector.progress_apply(lambda row: list(map(str.lower, row)))
+    return token_vector.progress_apply(lambda token_list: [token.lower() for token in token_list])
 
 
 @timer
@@ -81,22 +116,7 @@ def remove_punctuation(token_vector):
         Returns:
             numpy.array: Array containing tokenized sentence removed punctuation.
     """
-    punctuations = string.punctuation + "’" + "..." + "'"
-    return token_vector.progress_apply(lambda sentence: [word for word in sentence if word not in punctuations])
-
-
-@timer
-def remove_stopwords(token_vector, stopwords_language):
-    """ Function to remove stopwords out of an array of sentences.
-
-        Args:
-            token_vector (numpy.array): Array containing text.
-            stopwords_language (list): List of stopwords in a specific language.
-
-        Returns:
-            numpy.array: Array containing tokenized sentence removed stopwords.
-    """
-    return token_vector.progress_apply(lambda sentence: [word for word in sentence if word not in stopwords_language])
+    return token_vector.progress_apply(lambda token_list: [word for word in token_list if not word.is_punct])
 
 
 @timer
@@ -109,29 +129,26 @@ def remove_numbers(token_vector):
         Returns:
             numpy.array: Array containing tokenized sentence removed numbers.
     """
-    translation_table = str.maketrans('', '', string.digits)
-    return token_vector.progress_apply(lambda sentence: [word.translate(translation_table) for word in sentence])
+    return token_vector.progress_apply(lambda token_list: [word for word in token_list if not word.like_num])
 
 
 @timer
-def create_cleaned_token_embedding(sentence_vector, nlp_language, stopwords_language):
+def create_cleaned_token_embedding(sentence_vector, nlp_language):
     """ Function combine cleaning function for embedding-based features.
 
     Args:
         sentence_vector (numpy.array): Array containing text.
         nlp_language (object): Spacy pipeline.
-        stopwords_language (list): List of stopwords in a specific language.
 
     Returns:
         array: Cleaned array as Bag of Words.
     """
-    sentence_vector_lemmatized = lemmatize(sentence_vector, nlp_language)
-    token_vector = tokenize_sentence(sentence_vector_lemmatized)
-    token_vector_whitespace = strip_whitespace(token_vector)
-    token_vector_lowercase = lowercase(token_vector_whitespace)
-    token_vector_punctuation = remove_punctuation(token_vector_lowercase)
-    token_vector_stopwords = remove_stopwords(token_vector_punctuation, stopwords_language)
-    token_vector_preprocessed = remove_numbers(token_vector_stopwords)
+    token_vector_spacy = spacy(sentence_vector, nlp_language)
+    token_vector_stopwords = remove_stopwords(token_vector_spacy)
+    token_vector_punctuation = remove_punctuation(token_vector_stopwords)
+    token_vector_numbers = remove_numbers(token_vector_punctuation)
+    sentence_vector_lemmatized = lemmatize(token_vector_numbers)
+    token_vector_preprocessed = lowercase_spacy(sentence_vector_lemmatized)
 
     return token_vector_preprocessed
 

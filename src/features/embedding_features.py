@@ -29,13 +29,22 @@ def cosine_similarity_vector(sentence_embedding_source_vector, sentence_embeddin
     def cosine_similarity_pairwise(sentence_embedding_source, sentence_embedding_target):
         """ Calculate cosine similarity between two arrays.
         """
-        sentence_embedding_source_array = np.array(sentence_embedding_source).reshape(1, -1)
-        sentence_embedding_target_array = np.array(sentence_embedding_target).reshape(1, -1)
         try:
-            return cosine_similarity(X=sentence_embedding_source_array, Y=sentence_embedding_target_array,
-                                     dense_output=True)[0][0]
-        except ValueError:
-            return 0
+            sentence_embedding_source_array = np.array(list(sentence_embedding_source[0].values())).reshape(1, -1)
+            sentence_embedding_target_array = np.array(list(sentence_embedding_target[0].values())).reshape(1, -1)
+            try:
+                return cosine_similarity(X=sentence_embedding_source_array, Y=sentence_embedding_target_array,
+                                         dense_output=True)[0][0]
+            except ValueError:
+                return 0
+        except TypeError:
+            sentence_embedding_source_array = np.array(sentence_embedding_source).reshape(1, -1)
+            sentence_embedding_target_array = np.array(sentence_embedding_target).reshape(1, -1)
+            try:
+                return cosine_similarity(X=sentence_embedding_source_array, Y=sentence_embedding_target_array,
+                                         dense_output=True)[0][0]
+            except ValueError:
+                return 0
 
     cosine_similarity_score = df.progress_apply(lambda x: cosine_similarity_pairwise(x.sentence_embedding_source,
                                                                                      x.sentence_embedding_target),
@@ -63,12 +72,20 @@ def euclidean_distance_vector(sentence_embedding_source_vector, sentence_embeddi
     def euclidean_distance_pairwise(sentence_embedding_source, sentence_embedding_target):
         """ Calculate euclidean distance between two arrays.
         """
-        sentence_embedding_source_array = np.array(sentence_embedding_source).reshape(1, -1)
-        sentence_embedding_target_array = np.array(sentence_embedding_target).reshape(1, -1)
         try:
-            return euclidean_distances(X=sentence_embedding_source_array, Y=sentence_embedding_target_array)[0][0]
-        except ValueError:
-            return 0
+            sentence_embedding_source_array = np.array(list(sentence_embedding_source[0].values())).reshape(1, -1)
+            sentence_embedding_target_array = np.array(list(sentence_embedding_target[0].values())).reshape(1, -1)
+            try:
+                return euclidean_distances(X=sentence_embedding_source_array, Y=sentence_embedding_target_array)[0][0]
+            except ValueError:
+                return 0
+        except TypeError:
+            sentence_embedding_source_array = np.array(sentence_embedding_source).reshape(1, -1)
+            sentence_embedding_target_array = np.array(sentence_embedding_target).reshape(1, -1)
+            try:
+                return euclidean_distances(X=sentence_embedding_source_array, Y=sentence_embedding_target_array)[0][0]
+            except ValueError:
+                return 0
 
     euclidean_distance_score = df.progress_apply(lambda x: euclidean_distance_pairwise(x.sentence_embedding_source,
                                                                                        x.sentence_embedding_target),

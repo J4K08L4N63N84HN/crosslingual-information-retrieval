@@ -18,7 +18,7 @@ def difference_numerical(source_array, target_array):
             numpy.array: Array containing the differences.
     """
 
-    return (target_array - source_array).replace(np.nan, 0).replace(np.inf, 0).replace(np.log(0), 0)
+    return abs(target_array - source_array).replace(np.nan, 0).replace(np.inf, 0).replace(np.log(0), 0)
 
 
 @timer
@@ -33,7 +33,9 @@ def relative_difference_numerical(source_array, target_array):
             numpy.array: Array containing the relative differences.
     """
 
-    return ((target_array - source_array) / source_array).replace(np.nan, 0).replace(np.inf, 0).replace(np.log(0), 0)
+    return (abs(target_array - source_array) / (source_array + target_array)).replace(np.nan, 0).replace(np.inf,
+                                                                                                      0).replace(np.log(
+        0), 0)
 
 
 @timer
@@ -50,7 +52,7 @@ def normalized_difference_numerical(source_array, target_array, source_sentence_
             numpy.array: Array containing the normalized differences.
     """
 
-    return ((source_array / source_sentence_length) - (target_array / target_sentence_length)).replace(
+    return abs((source_array / source_sentence_length) - (target_array / target_sentence_length)).replace(
         np.nan, 0).replace(
         np.inf, 0).replace(
         np.log(0), 0)
