@@ -35,6 +35,19 @@ def MAP_score(source_id, target_labels, prediction):
 
 def pipeline_model_optimization(model, parameter_grid, scaler, trainset, testset, starting_features, added_features,
                                 threshold_map_feature_selection=0.001):
+    """ Funtion to combine the feature selection and model optimization into a pipeline to use.
+    Args:
+            model (ML model): Initialised model to fit the data.
+            parameter_grid (dictionary): Dictionary grid to test different feature combinations.
+            scaler (ML scaler): Scaler to scale our feature into a given range.
+            trainset (dataframe): Dataframe containing our training data.
+            testset (dataframe): Dataframe containing our testing data.
+            starting_features (array): Array containing the starting features for our first training.
+            added_features (array): Array containing the features to be added for further training.
+            threshold_map_feature_selection (float): Get a threshold float number that defines how much a features has to
+                                                improve our Map score to be added into the model.
+
+    """
     print("-----------------First do Forward Selection-----------------")
     forward_selection(model, scaler, trainset, testset, starting_features, added_features,
                       threshold_map_feature_selection)
@@ -72,8 +85,8 @@ def forward_selection(model, scaler, trainset, testset, starting_features, added
 
 
 def feature_selection(model, scaler, trainset, testset, starting_features, added_features,
-                      threshold_map_feature_selection=0.001):
-    """
+                      threshold_map_feature_selection=0.0001):
+    """ Function to select features using forward selection.
     Args:
             model (ML model): Initialised model to fit the data.
             scaler (ML scaler): Scaler to scale our feature into a given range.
