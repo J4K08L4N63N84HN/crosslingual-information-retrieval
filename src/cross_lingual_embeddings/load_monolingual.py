@@ -45,23 +45,23 @@ def load_translation_dict(dict_path):
     translation_target = []
     file_type = dict_path.split(".")[-1]
     if file_type == "tsv":
-      for line in list(codecs.open(dict_path, "r", encoding='utf8', errors='replace').readlines()):
-          line = line.strip().split("\t")
-          translation_source.append(line[0].lower())
-          translation_target.append(line[1].lower())
+        for line in list(codecs.open(dict_path, "r", encoding='utf8', errors='replace').readlines()):
+            line = line.strip().split("\t")
+            translation_source.append(line[0].lower())
+            translation_target.append(line[1].lower())
     elif file_type == "txt":
-      with open(dict_path) as file_in:
-          for line in file_in:
-              line = line.rstrip("\n")
-              line = ' '.join(line.split())
-              [src, trg] = line.split(" ")
-              translation_source.append(src.lower())
-              translation_target.append(trg.lower())
+        with open(dict_path) as file_in:
+            for line in file_in:
+                line = line.rstrip("\n")
+                line = ' '.join(line.split())
+                [src, trg] = line.split(" ")
+                translation_source.append(src.lower())
+                translation_target.append(trg.lower())
     else:
         print("No supported dictionary file type")
 
-
     return translation_source, translation_target
+
 
 def save_clew(clew_method, name):
     """ Save Cross Lingual Word Embeddings.
@@ -84,4 +84,3 @@ def save_clew(clew_method, name):
 
     with open(name + '_trg_word.pkl', 'wb') as f:
         pickle.dump(clew_method.trg_word2ind, f)
-

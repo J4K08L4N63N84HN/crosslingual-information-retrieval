@@ -9,10 +9,10 @@ from unsupervised_cle import VecMap
 from text_encoders import TextEncoders
 from utils import normalize_matrix
 
+
 def clew_induction(path_source_language, path_target_language, train_translation_dict_path,
                    train_translation_dict_1k_path, test_translation_dict_path, new_test_translation_path,
                    name_translation, number_tokens=100000, save_embedding=False):
-
     """Induce Cross Lingual Word Embeddings (Proc, Proc-B, VecMap) and Evaluate them on BLI task.
 
     Args:
@@ -103,4 +103,3 @@ def clew_induction(path_source_language, path_target_language, train_translation
     xlm_r_last_layer.create_source_target_embedding(test_translation_dict_path, use_layer=12)
     Evaluator(xlm_r_last_layer, test_translation_dict_path).evaluation_on_BLI()
     del xlm_r_last_layer
-

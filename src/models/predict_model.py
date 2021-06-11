@@ -229,7 +229,7 @@ def downsample(imbalanced_data):
     y = imbalanced_data["Translation"].astype(int)
     y = np.where((y == 0), 0, 1)
 
-    # Indicies of each class' observations
+    # Indices of each class' observations
     i_class0 = np.where(y == 0)[0]
     i_class1 = np.where(y == 1)[0]
 
@@ -274,7 +274,7 @@ def evaluate_text_encoder(prediction_path_folder, feature_retrieval):
                             feature_retrieval["Translation"][start_index:end_index],
                             pred_prob)
 
-        #print("MAP score from index {} to {} is: {}".format(start_index, end_index, map_score))
+        # print("MAP score from index {} to {} is: {}".format(start_index, end_index, map_score))
         total_map_score += map_score
 
     total_map_score /= index+1

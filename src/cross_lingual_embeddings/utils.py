@@ -209,9 +209,8 @@ def big_matrix_multiplication(a, b, get_max=False, chunk_size=10000):
     result = []
     num_iters = a.shape[0] // chunk_size + (0 if a.shape[0] % chunk_size == 0 else 1)
     for i in range(num_iters):
-      res_batch = numpy.dot(a[i * chunk_size : (i+1) * chunk_size, :], b)
-      if get_max:
-          res_batch = numpy.argmax(res_batch, axis=1).tolist()
-      result.extend(res_batch)
+        res_batch = numpy.dot(a[i * chunk_size: (i + 1) * chunk_size, :], b)
+        if get_max:
+            res_batch = numpy.argmax(res_batch, axis=1).tolist()
+        result.extend(res_batch)
     return result
-

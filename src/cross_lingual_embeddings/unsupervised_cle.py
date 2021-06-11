@@ -1,5 +1,6 @@
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from load_monolingual import load_embedding
 from utils import vecmap_normalize, supports_cupy, get_cupy, topk_mean, dropout
@@ -283,7 +284,6 @@ class VecMap:
                     print('\t- Drop probability: {0:9.4f}%'.format(100 - 100 * keep_prob))
                     t = time.time()
 
-            
             it += 1
         if use_gpu:
             self.proj_embedding_source_target = xp.asnumpy(xw)

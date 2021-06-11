@@ -242,7 +242,7 @@ class TextEncoders:
         """Create Embedding for each term in the sentence.
 
         Args:
-            sequence: str, Text Input
+            sentence: str, Text Input
 
         Returns:
             array: Embedding for each term
