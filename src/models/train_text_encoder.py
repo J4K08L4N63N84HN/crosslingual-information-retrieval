@@ -6,7 +6,7 @@ from scipy.special import softmax
 from torch.nn import CrossEntropyLoss
 from transformers import Trainer, TrainingArguments
 from torch.utils.data import DataLoader, SequentialSampler
-
+import pickle
 np.random.seed(42)
 CLASS_IMBALANCE_WEIGHTS = [11 / (2 * 10), 11 / (2 * 1)]
 NUM_LABELS = 2
@@ -16,6 +16,7 @@ class Torch_dataset_mono(torch.utils.data.Dataset):
     """Create Torch Dataset for Text Encoder training.
 
     """
+
     def __init__(self, data):
         """Initialize Torch Dataset with Tokenizer and data
 
@@ -60,6 +61,7 @@ class WeightedLossTrainer(Trainer):
     correct translation and 10 different negative examples for one source sentence.
 
     """
+
     def compute_loss(self, model, inputs, return_outputs=False):
         """Compute the weighted Loss
 
@@ -100,3 +102,38 @@ class WeightedLossTrainer(Trainer):
             num_workers=self.args.dataloader_num_workers,
             shuffle=False
         )
+
+
+def predict_loop(trainer, dataset, save_dir, index=None, save_steps=1000):
+    """Do Predictions with Text Encoder and save Predictions after specified steps.
+
+    Args:
+        trainer: Huggingface Trainer
+        dataset: Retrieval Ranking Dataset
+        save_dir: Save File Path
+        index: Specify Start Iteration (useful if you continue prediction loop)
+        save_steps: Save Predictions after save_steps
+
+
+    """
+    length_current_dataset = len(dataset)
+    if index:
+        index = index
+    else:
+        index = 0
+    while length_current_dataset != 0:
+        start_index = str(index * save_steps)
+        end_index = str((index + 1) * save_steps)
+        print("Current Iteration: {}".format(index + 1))
+        print("Current Size of Training Set: {}".format(length_current_dataset))
+        print("Current Chunk of dataset: {} to {}".format(start_index, end_index))
+        small_dataset = dataset[:save_steps]
+        small_dataset_tokenize = Torch_dataset_mono(small_dataset)
+        predictions = trainer.predict(small_dataset_tokenize)
+
+        with open(os.path.join(save_dir, "prediction_" + start_index + "_" + end_index + ".pickle"), 'wb') as handle:
+            pickle.dump(predictions, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        print("Done with: {} to {}".format(start_index, end_index))
+        dataset = dataset[save_steps:]
+        index += 1
+        length_current_dataset = len(dataset)
