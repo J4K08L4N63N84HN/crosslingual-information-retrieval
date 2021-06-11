@@ -164,7 +164,8 @@ def create_cleaned_text(sentence_vector):
         array: Cleaned array as Bag of Word.
     """
     token_vector = tokenize_sentence(sentence_vector)
-    token_vector_whitespace = strip_whitespace(token_vector)
+    token_vector_stopwords = remove_stopwords(token_vector)
+    token_vector_whitespace = strip_whitespace(token_vector_stopwords)
     token_vector_lowercase = lowercase(token_vector_whitespace)
 
     return token_vector_lowercase
