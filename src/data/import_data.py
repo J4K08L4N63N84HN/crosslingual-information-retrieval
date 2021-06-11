@@ -1,7 +1,7 @@
 """ Functions to import europarl dataset and create random subset for our task.
 """
 
-import pickle
+import pickle5 as pickle
 
 import numpy as np
 import pandas as pd

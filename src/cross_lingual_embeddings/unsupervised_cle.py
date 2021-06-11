@@ -14,6 +14,20 @@ except:
 
 
 class VecMap:
+    """Induce CLWE with VecMap.
+
+   Attributes:
+       target_embedding_matrix (array): Original Monolingual Source Embedding Matrix.
+       src_indices (list): Build the seed dictionary.
+       trg_indices (list): Build the seed dictionary.
+       src_word2ind (dict): Dictionary of source word to index.
+       trg_word2ind (dict): Dictionary of target word to index.
+       src_ind2word (dict): Dictionary of index to word source.
+       trg_ind2word (dict): Dictionary of index to word target.
+       norm_trg_embedding_matrix (array): Original Normalized Monolingual Source Embedding Matrix.
+       proj_embedding_source_target (array): Projected Source Embedding to Target Space (CLWE).
+
+   """
     # Use CSLS for dictionary induction
     csls_neighborhood = 10
     # Restrict the vocabulary to the top k entries for unsupervised initialization
@@ -53,7 +67,13 @@ class VecMap:
     def __init__(self,
                  path_source_language,
                  path_target_language, number_tokens=5000):
+        """Initialize VecMap Method Class.
 
+            Args:
+                path_source_language: Path to source Language.
+                path_target_language: Path to target Language.
+                number_tokens: Number of tokens per language.
+        """
         # Built Embeddings
         self.source_embedding_word, self.source_embedding_matrix = load_embedding(path_source_language, number_tokens)
         self.target_embedding_word, self.target_embedding_matrix = load_embedding(path_target_language, number_tokens)
@@ -71,7 +91,14 @@ class VecMap:
         self.norm_trg_embedding_matrix = vecmap_normalize(self.target_embedding_matrix)
 
     def build_seed_dictionary(self, use_gpu=False):
+        """Built the Seed Dictionary.
 
+        Args:
+            use_gpu (boolean): Use GPU (recommended) or not
+
+        Returns:
+
+        """
         if use_gpu:
             if not supports_cupy():
                 print('ERROR: Install CuPy for CUDA support')
@@ -109,6 +136,14 @@ class VecMap:
         del src_sim, trg_sim, sim
 
     def training_loop(self, use_gpu=False):
+        """Start the Training Loop of VecMap
+
+        Args:
+            use_gpu: Use GPU (recommended) or not
+
+        Returns:
+
+        """
         if use_gpu:
             if not supports_cupy():
                 print('ERROR: Install CuPy for CUDA support')
@@ -258,6 +293,14 @@ class VecMap:
             self.norm_trg_embedding_matrix = zw
 
     def create_cross_lingual_word_embedding(self, use_gpu=False):
+        """Induce the CLWE with VecMap
+
+        Args:
+            use_gpu: Use GPU (recommended) or not
+
+        Returns:
+
+        """
         s = time.time()
         self.build_seed_dictionary(use_gpu)
         self.training_loop(use_gpu)

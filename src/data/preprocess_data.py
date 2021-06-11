@@ -50,12 +50,11 @@ def spacy(sentence_vector, nlp_language):
             numpy.array: Array containing the lemmatized words.
     """
     lemmatizer_language = nlp_language.get_pipe("lemmatizer")
-    return sentence_vector.progress_apply(lambda sentence:
-        [token for token in nlp_language(sentence)])
+    return sentence_vector.progress_apply(lambda sentence: [token for token in nlp_language(sentence)])
 
 
 @timer
-def remove_stopwords(token_vector):
+def remove_stopwords(token_vector, stopwords_list):
     """ Function to remove stopwords out of an array of sentences.
 
         Args:
@@ -65,7 +64,7 @@ def remove_stopwords(token_vector):
         Returns:
             numpy.array: Array containing tokenized sentence removed stopwords.
     """
-    return token_vector.progress_apply(lambda token_list: [word for word in token_list if not word.is_stop])
+    return token_vector.progress_apply(lambda token_list: [word for word in token_list if word is not stopwords_list])
 
 
 @timer
@@ -133,7 +132,7 @@ def remove_numbers(token_vector):
 
 
 @timer
-def create_cleaned_token_embedding(sentence_vector, nlp_language):
+def create_cleaned_token_embedding(sentence_vector, nlp_language, stopwords_list):
     """ Function combine cleaning function for embedding-based features.
 
     Args:
@@ -144,7 +143,7 @@ def create_cleaned_token_embedding(sentence_vector, nlp_language):
         array: Cleaned array as Bag of Words.
     """
     token_vector_spacy = spacy(sentence_vector, nlp_language)
-    token_vector_stopwords = remove_stopwords(token_vector_spacy)
+    token_vector_stopwords = remove_stopwords(token_vector_spacy, stopwords_list)
     token_vector_punctuation = remove_punctuation(token_vector_stopwords)
     token_vector_numbers = remove_numbers(token_vector_punctuation)
     sentence_vector_lemmatized = lemmatize(token_vector_numbers)
@@ -154,7 +153,7 @@ def create_cleaned_token_embedding(sentence_vector, nlp_language):
 
 
 @timer
-def create_cleaned_text(sentence_vector):
+def create_cleaned_text(sentence_vector, stopwords_list):
     """ Function combine cleaning function for text-based features.
 
     Args:
@@ -164,7 +163,8 @@ def create_cleaned_text(sentence_vector):
         array: Cleaned array as Bag of Word.
     """
     token_vector = tokenize_sentence(sentence_vector)
-    token_vector_whitespace = strip_whitespace(token_vector)
+    token_vector_stopwords = remove_stopwords(token_vector, stopwords_list)
+    token_vector_whitespace = strip_whitespace(token_vector_stopwords)
     token_vector_lowercase = lowercase(token_vector_whitespace)
 
     return token_vector_lowercase
@@ -272,8 +272,9 @@ def number_pos(sentence_vector, nlp_language, pos):
        Returns:
            numpy.array: Array containing the total number of a given part-of-speech tag.
        """
+
     return sentence_vector.progress_apply(
-        lambda sentence: len([token for token in nlp_language(sentence) if token.pos_ == pos]))
+        lambda sentence: len([token for token in sentence if token.pos_ == pos]))
 
 
 @timer
@@ -290,7 +291,7 @@ def number_times(sentence_vector, nlp_language, tense):
 
     """
     return sentence_vector.progress_apply(
-        lambda sentence: len([token for token in nlp_language(sentence) if token.morph.get(
+        lambda sentence: len([token for token in sentence if token.morph.get(
             "Tense") == tense]))
 
 

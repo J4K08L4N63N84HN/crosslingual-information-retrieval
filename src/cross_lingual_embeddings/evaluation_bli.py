@@ -7,6 +7,14 @@ from load_monolingual import load_translation_dict
 
 
 class Evaluator():
+    """Evaluates Method on BLI Task.
+
+   Attributes:
+       test_translation_source (list): List of source translation words.
+       test_translation_target (list): List of source target words.
+       CrossLingualModel (class): Class of Method to be evaluated (e.g. VecMap).
+
+   """
     # Test Translation Dictionary
     test_translation_source = []
     test_translation_target = []
@@ -14,7 +22,12 @@ class Evaluator():
     CrossLingualModel = None
 
     def __init__(self, CrossLingualModel, test_translation_dict_path):
+        """ Initialize class with Class of Method and translation dictionary.
 
+        Args:
+            CrossLingualModel: Class, Class of Method to be evaluated (e.g. VecMap).
+            test_translation_dict_path: Path to test dictionary.
+        """
         # Built Test Translation Dictionary
         self.test_translation_source, self.test_translation_target = load_translation_dict(test_translation_dict_path)
 
@@ -22,6 +35,13 @@ class Evaluator():
         self.CrossLingualModel = CrossLingualModel
 
     def evaluation_on_BLI(self, verbose=0):
+        """ Start Evaluation on given Test translation dictionary.
+        Args:
+            verbose: Set to 1, to see top 3 predictions of the first 5 words.
+
+        Returns:
+
+        """
         ranking = []
         iteration = 0
         norm_proj_src_emb = normalize_matrix(self.CrossLingualModel.proj_embedding_source_target)

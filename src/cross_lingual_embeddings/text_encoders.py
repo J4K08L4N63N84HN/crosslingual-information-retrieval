@@ -10,6 +10,18 @@ from load_monolingual import load_translation_dict, load_embedding
 
 
 class TextEncoders:
+    """Create Text Encoder (only XLM-R for now) to create sentence embeddings.
+
+       Attributes:
+           target_embedding_matrix (array): Original Monolingual Source Embedding Matrix.
+           src_word2ind (dict): Dictionary of source word to index.
+           trg_word2ind (dict): Dictionary of target word to index.
+           src_ind2word (dict): Dictionary of index to word source.
+           trg_ind2word (dict): Dictionary of index to word target.
+           norm_trg_embedding_matrix (array): Original Normalized Monolingual Source Embedding Matrix.
+           proj_embedding_source_target (array): Projected Source Embedding to Target Space (CLWE).
+
+    """
     # Target Embedding
     target_embedding_matrix = []
 
@@ -31,7 +43,11 @@ class TextEncoders:
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
     def __init__(self, choose_model):
+        """Initialize Text Encoder.
 
+        Args:
+            choose_model (str): Only XLM-R possible for now.
+        """
         self.model_max_length = 128
         if choose_model.lower() == "XLM-R".lower():
             self.tokenizer = XLMRobertaTokenizer.from_pretrained('xlm-roberta-base',
@@ -60,9 +76,27 @@ class TextEncoders:
             assert False, print("No correct model was chosen!!")
 
     def tokenize(self, sequence):
+        """Tokenize a sequence.
+
+        Args:
+            sequence (str): Sequence of characters.
+
+        Returns:
+            tuple: Tokenized Sequence.
+
+        """
         return self.tokenizer.tokenize(sequence)
 
     def encode(self, sequence):
+        """Encode the Sequence with additional information about embedding terms
+        to later calculate embedding for each term
+
+        Args:
+            sequence: String Sequence.
+
+        Returns:
+
+        """
 
         word_tokens = {}
         worpiece_tokens = []
@@ -119,10 +153,15 @@ class TextEncoders:
         return sent, sequence_length, word_tokens
 
     def embedding(self, sequence):
-        """
-        Create Embedding for Sequence 
-        :param sequence: str, Text Input
-        :return: Embedding for text
+        """ Create Embedding for sequence.
+
+        Args:
+            sequence: str, Text Input
+
+        Returns:
+            list: Embedding for sequence
+            list: Word Tokens
+
         """
 
         sent, _, word_tokens = self.encode(sequence)
@@ -132,6 +171,18 @@ class TextEncoders:
         return outputs, word_tokens
 
     def create_embedding_for_each_term(self, sequence, use_layer=11):
+        """ Create Embedding for each term by taking the first subtoken embedding.
+
+        Args:
+            sequence: str, Text Input
+            use_layer: Layer to take embeddings from.
+
+        Returns:
+            array: Embedding for each term
+            dict: Dictionary term to id
+            dict: Dictionary id to term
+
+        """
         outputs, word_tokens = self.embedding(sequence)
         layer_output = outputs[2][use_layer].squeeze()
 
@@ -150,6 +201,15 @@ class TextEncoders:
         return embedding_each_term, term2id, id2term
 
     def create_source_target_embedding(self, test_translation_dict_path, use_layer=11):
+        """Create Embeddings for each word in the given dictonary (single words).
+
+        Args:
+            test_translation_dict_path: path to dictionary
+            use_layer: Layer to take embeddings from
+
+        Returns:
+
+        """
 
         # Load Dictionary
         source_word_translation, target_word_translation = load_translation_dict(test_translation_dict_path)
@@ -179,5 +239,16 @@ class TextEncoders:
         self.norm_trg_embedding_matrix = normalize_matrix(self.target_embedding_matrix)
 
     def create_embedding_sentence(self, sentence):
+        """Create Embedding for each term in the sentence.
+
+        Args:
+            sequence: str, Text Input
+
+        Returns:
+            array: Embedding for each term
+            dict: Dictionary term to id
+            dict: Dictionary id to term
+
+        """
         embedding_each_term, term2id, id2term = self.create_embedding_for_each_term(sentence, use_layer=12)
         return embedding_each_term, term2id, id2term
