@@ -39,7 +39,7 @@ class PreprocessingEuroParl:
         self.embedding_list = []
         self.preprocessed = pd.DataFrame()
 
-    def preprocess_sentences(self, nlp_source, nlp_target):
+    def preprocess_sentences(self, nlp_source, nlp_target, stopword_source, stopword_target):
         """ Preprocess the source sentence dataset
 
             Args:
@@ -52,12 +52,12 @@ class PreprocessingEuroParl:
         self.preprocessed["id_source"] = self.dataframe["id_source"]
         self.preprocessed["id_target"] = self.dataframe["id_target"]
         self.preprocessed["token_preprocessed_embedding_source"] = create_cleaned_token_embedding((self.dataframe[
-            "text_source"]), nlp_source)
+            "text_source"]), nlp_source, stopword_source)
         self.preprocessed["token_preprocessed_embedding_target"] = create_cleaned_token_embedding((self.dataframe[
-            "text_target"]), nlp_target)
+            "text_target"]), nlp_target, stopword_target)
 
-        self.dataframe["text_preprocessed_source"] = create_cleaned_text(self.dataframe["text_source"])
-        self.dataframe["text_preprocessed_target"] = create_cleaned_text(self.dataframe["text_target"])
+        self.dataframe["text_preprocessed_source"] = create_cleaned_text(self.dataframe["text_source"], stopword_source)
+        self.dataframe["text_preprocessed_target"] = create_cleaned_text(self.dataframe["text_target"], stopword_target)
 
         self.preprocessed["Translation"] = np.ones((int(self.preprocessed.shape[0]), 1),
                                                    dtype=np.int8)
@@ -109,31 +109,31 @@ class PreprocessingEuroParl:
         for pos in self.pos_list:
             self.preprocessed[f"number_{pos}_source"] = number_pos(self.dataframe["text_source_spacy"], nlp_source,
                                                                    pos)
-            self.preprocessed[f"number_{pos}_target"] = number_pos(self.dataframe["text_target"], nlp_target,
+            self.preprocessed[f"number_{pos}_target"] = number_pos(self.dataframe["text_target_spacy"], nlp_target,
                                                                    pos)
 
         for tense in self.tense_list:
             self.preprocessed[f"number_{tense}_source"] = number_times(self.dataframe["text_source_spacy"],
                                                                        nlp_source,
                                                                        tense)
-            self.preprocessed[f"number_{tense}_target"] = number_times(self.dataframe["text_target"],
+            self.preprocessed[f"number_{tense}_target"] = number_times(self.dataframe["text_target_spacy"],
                                                                        nlp_target,
                                                                        tense)
 
         self.preprocessed["list_named_numbers_source"] = named_numbers(self.dataframe["text_source"])
         self.preprocessed["list_named_numbers_target"] = named_numbers(self.dataframe["text_target"])
 
-    def create_embedding_information(self, embedding):
+    def create_embedding_information(self, embedding, language_pair="en_de"):
         """ Create information based on embeddings.
 
             Args:
                 embedding (str): Type of embedding to create information.
 
         """
-        embedding_array_source_path = "../data/interim/en_de_" + embedding + "_src_emb.pkl"
-        embedding_dictionary_source_path = "../data/interim/en_de_" + embedding + "_src_word.pkl"
-        embedding_array_target_path = "../data/interim/en_de_" + embedding + "_trg_emb.pkl"
-        embedding_dictionary_target_path = "../data/interim/en_de_" + embedding + "_trg_word.pkl"
+        embedding_array_source_path = "../data/interim/" + language_pair + "_" + embedding + "_src_emb.pkl"
+        embedding_dictionary_source_path = "../data/interim/" + language_pair + "_" + embedding + "_src_word.pkl"
+        embedding_array_target_path = "../data/interim/" + language_pair + "_" + embedding + "_trg_emb.pkl"
+        embedding_dictionary_target_path = "../data/interim/" + language_pair + "_" + embedding + "_trg_word.pkl"
 
         embedding_array_normalized_source, embedding_dictionary_source = load_embeddings(
             embedding_array_source_path, embedding_dictionary_source_path)

@@ -3,6 +3,10 @@ import numpy as np
 from sklearn.utils import shuffle
 import itertools
 from tqdm import tqdm
+import os
+from scipy.special import softmax
+import glob
+from pickle5 import pickle
 
 
 def MAP_score(source_id, target_labels, prediction):
@@ -69,6 +73,18 @@ def pipeline_model_optimization(model, parameter_grid, scaler, trainset, testset
 
 def forward_selection(model, scaler, trainset, testset, starting_features, added_features,
                       threshold_map_feature_selection):
+    """Do Forward Selection given starting features and feature pool to add
+
+    Args:
+        model (ML model): Initialised model to fit the data.
+        scaler (ML scaler): Scaler to scale our feature into a given range.
+        trainset (dataframe): Dataframe containing our training data.
+        testset (dataframe): Dataframe containing our testing data.
+        starting_features (array): Array containing the starting features for our first training.
+        added_features (array): Array containing the features to be added for further training.
+        threshold_map_feature_selection (int): Threshold improvement on MAP for adding a feature
+
+    """
     length_current_start_feature = len(starting_features)
     index = 1
     map_score = 0
@@ -131,6 +147,16 @@ def feature_selection(model, scaler, trainset, testset, starting_features, added
 
 
 def threshold_counts(s, threshold=0):
+    """Minimum number of unique values in a pandas column
+
+    Args:
+        s (pandas series): Column to check
+        threshold: Minimum number of unique values in percentage
+
+    Returns:
+        boolean: If threshold is reached or not
+
+    """
     counts = s.value_counts(normalize=True, dropna=False)
     if (counts >= threshold).any():
         return False
@@ -139,6 +165,20 @@ def threshold_counts(s, threshold=0):
 
 def grid_search_hyperparameter_tuning(parameter_grid, model, data_train, target_train, data_test,
                                       original_retrieval_dataset):
+    """Do Grid Search for Hyperparameter-tuning.
+
+    Args:
+        parameter_grid (dict): Hyper-Parameter Grid
+        model (ML model): Initialised model to fit the data.
+        data_train (dataframe): Training Set.
+        target_train: (dataframe): Labels of Training Set
+        data_test (dataframe): Test Set.
+        original_retrieval_dataset (dataframe): Ranking Retrieval Set to be evaluated on.
+
+    Returns:
+        arrays: returns best combination, best map score and all combinations with respective map score
+
+    """
     if len(parameter_grid) == 0:
         return None, None, None
 
@@ -177,10 +217,19 @@ def grid_search_hyperparameter_tuning(parameter_grid, model, data_train, target_
 
 
 def downsample(imbalanced_data):
+    """Function to downsample a dataset to its minority class.
+
+    Args:
+        imbalanced_data (dataframe): Dataset to be downsampled
+
+    Returns:
+        dataframe: Downsampled dataframe
+
+    """
     y = imbalanced_data["Translation"].astype(int)
     y = np.where((y == 0), 0, 1)
 
-    # Indicies of each class' observations
+    # Indices of each class' observations
     i_class0 = np.where(y == 0)[0]
     i_class1 = np.where(y == 1)[0]
 
@@ -198,3 +247,37 @@ def downsample(imbalanced_data):
     index_balanced = i_class0_downsampled.tolist() + i_class1.tolist()
     index_balanced = shuffle(index_balanced, random_state=42)
     return imbalanced_data.iloc[index_balanced, :]
+    
+    
+def evaluate_text_encoder(prediction_path_folder, feature_retrieval):
+    """ Evaluate Text Encoder with given predictions (must be done beforehand) on retrieval dataset
+
+    Args:
+        prediction_path_folder (path): Path to Predictions of a Model
+        feature_retrieval (dataframe): Retrieval Dataset to be evaluated on
+
+    Returns:
+        int: Map score
+
+    """
+    total_map_score = 0
+    for index, filepath in enumerate(sorted(glob.iglob(os.path.join(prediction_path_folder, "*")), key=os.path.getmtime)):
+        start_index = int(filepath.split("_")[-2])
+        end_index = int(filepath.split("_")[-1].split(".")[0])
+        with open(filepath, 'rb') as handle:
+            predictions = pickle.load(handle)
+
+        logits, labels, metrics = predictions
+        pred_prob = softmax(logits, axis=1)
+
+        map_score = MAP_score(feature_retrieval["source_id"][start_index:end_index],
+                            feature_retrieval["Translation"][start_index:end_index],
+                            pred_prob)
+
+        # print("MAP score from index {} to {} is: {}".format(start_index, end_index, map_score))
+        total_map_score += map_score
+
+    total_map_score /= index+1
+    print("Result: MAP Score is: {}".format(total_map_score))
+
+    return total_map_score

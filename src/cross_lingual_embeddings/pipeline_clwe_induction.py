@@ -7,12 +7,28 @@ from supervised_cle import Projection_based_clwe
 from evaluation_bli import Evaluator
 from unsupervised_cle import VecMap
 from text_encoders import TextEncoders
+from utils import normalize_matrix
 
 
 def clew_induction(path_source_language, path_target_language, train_translation_dict_path,
                    train_translation_dict_1k_path, test_translation_dict_path, new_test_translation_path,
                    name_translation, number_tokens=100000, save_embedding=False):
+    """Induce Cross Lingual Word Embeddings (Proc, Proc-B, VecMap) and Evaluate them on BLI task.
 
+    Args:
+        path_source_language (path): Path to Source Embedding.
+        path_target_language (path): Path to Target Embedding.
+        train_translation_dict_path (path): Path to Translation dictionary 5k
+        train_translation_dict_1k_path (path): Path to Translation dictionary 1k
+        test_translation_dict_path (path): Path to Translation test dictionary
+        new_test_translation_path (path): Path to Translation test dictionary
+        name_translation (str): name of saved files
+        number_tokens (int): number of tokens used for monolingual word embeddings
+        save_embedding (boolean): To save or not save the created CLWE
+
+    Returns:
+
+    """
 
     print("\nFirst, we cut the test dictionaries to the monolingual vocabularies:")
     cut_dictionary_to_vocabulary(path_source_language, path_target_language,
@@ -67,6 +83,8 @@ def clew_induction(path_source_language, path_target_language, train_translation
     vec_map.training_loop(use_gpu)
     Evaluator(vec_map, test_translation_dict_path).evaluation_on_BLI()
     if save_embedding:
+        vec_map.proj_embedding_source_target = normalize_matrix(vec_map.proj_embedding_source_target)
+        vec_map.target_embedding_matrix = vec_map.norm_trg_embedding_matrix
         save_clew(vec_map, name_translation + "_vecmap")
     del vec_map
 
@@ -85,4 +103,3 @@ def clew_induction(path_source_language, path_target_language, train_translation
     xlm_r_last_layer.create_source_target_embedding(test_translation_dict_path, use_layer=12)
     Evaluator(xlm_r_last_layer, test_translation_dict_path).evaluation_on_BLI()
     del xlm_r_last_layer
-

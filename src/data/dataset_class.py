@@ -69,14 +69,15 @@ class DataSet:
             drop=True)
         sample_target = preprocessed_target.sample(n_model * sample_size_k, replace=True, random_state=42).reset_index(
             drop=True)
+
         random_sample_wrong = pd.concat([multiplied_source, sample_target], axis=1)
 
         # Select only the 2*k closest sentence embeddings for training to increase the complexity of the task for
         # the supervised classifier.
-        random_sample_wrong["cosine_similarity"] = cosine_similarity_vector(random_sample_wrong[
-                                                                                "sentence_embedding_tf_idf_proc_5k_source"],
-                                                                            random_sample_wrong[
-                                                                                "sentence_embedding_tf_idf_proc_5k_target"])
+        random_sample_wrong["cosine_similarity"] = cosine_similarity_vector(
+            random_sample_wrong["sentence_embedding_tf_idf_proc_5k_source"],
+            random_sample_wrong["sentence_embedding_tf_idf_proc_5k_target"])
+        
         random_sample_k_index = random_sample_wrong.groupby("id_source")['cosine_similarity'].nlargest(k)
 
         rows = []

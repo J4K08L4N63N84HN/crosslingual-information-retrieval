@@ -8,6 +8,27 @@ import numpy as np
 
 
 class Projection_based_clwe:
+    """Induce CLWE with Proc-B and Proc.
+
+   Attributes:
+       source_embedding_matrix (array): Original Monolingual Source Embedding Matrix.
+       target_embedding_matrix (array): Original Monolingual Source Embedding Matrix.
+       src_word2ind (dict): Dictionary of source word to index.
+       trg_word2ind (dict): Dictionary of target word to index.
+       src_ind2word (dict): Dictionary of index to word source.
+       trg_ind2word (dict): Dictionary of index to word target.
+       norm_src_embedding_matrix (array): Original Normalized Monolingual Source Embedding Matrix.
+       norm_trg_embedding_matrix (array): Original Normalized Monolingual Source Embedding Matrix.
+       train_translation_source (dict): List of source translation words.
+       train_translation_target (dict): List of target translation words.
+       X_source_embedding (array): Subspace of source embedding, depending on translation dictionary.
+       X_target_embedding (array): Subspace of taarget embedding, depending on translation dictionary.
+       mapping_source_target (array): Source to Target Matrix Projection.
+       mapping_target_source (array): Target to Source Matrix Projection.
+       proj_embedding_source_target (array): Projected Source Embedding to Target Space (CLWE).
+       proj_embedding_target_source (array): Projected Target Embedding to Source Space (CLWE).
+
+   """
     # Embeddings
     source_embedding_matrix = []
     target_embedding_matrix = []
@@ -27,8 +48,6 @@ class Projection_based_clwe:
     # Train Translation Dictionary
     train_translation_source = []
     train_translation_target = []
-    test_translation_source = []
-    test_translation_target = []
 
     # Created Subspace
     X_source_embedding = []
@@ -45,7 +64,14 @@ class Projection_based_clwe:
     def __init__(self,
                  path_source_language, path_target_language,
                  train_translation_dict_path, number_tokens=5000):
+        """Proc and Proc-b Method Class.
 
+        Args:
+            path_source_language (path): Path to source Language.
+            path_target_language (path): Path to target Language.
+            train_translation_dict_path (path): Path to train translation dictionary.
+            number_tokens (int): Number of tokens per language.
+        """
         # Built Embeddings
         self.source_embedding_word, self.source_embedding_matrix = load_embedding(path_source_language, number_tokens)
         self.target_embedding_word, self.target_embedding_matrix = load_embedding(path_target_language, number_tokens)
@@ -67,6 +93,15 @@ class Projection_based_clwe:
         self.norm_trg_embedding_matrix = normalize_matrix(self.target_embedding_matrix)
 
     def proc_bootstrapping(self, growth_rate=1.5, limit=10000):
+        """Function to use Proc-B method - Induces CLWE.
+
+        Args:
+            growth_rate (int): Growth rate of augmented dictionary.
+            limit (int): Augmented Dictionary Limit
+
+        Returns:
+
+        """
         print("Length of Original dictionary: {}".format(len(self.train_translation_source)))
         size = 0
         current_iteration = 0
@@ -93,12 +128,28 @@ class Projection_based_clwe:
             print("Length of new dictionary: {}".format(len(self.train_translation_source)))
 
     def proc(self, source_to_target):
+        """Function to use Proc method - Induces CLWE.
 
+        Args:
+            source_to_target (boolean): Define the direction of projection.
+
+        Returns:
+
+        """
         self.get_subspace()
         self.solve_proscrutes_problem(source_to_target)
         self.project_embedding_space(source_to_target)
 
     def augment_dictionary(self, growth_rate, limit):
+        """Augment the Dictionary based on Proc-B method.
+
+        Args:
+            growth_rate (int): Growth rate of augmented dictionary.
+            limit (int): Augmented Dictionary Limit
+
+        Returns:
+
+        """
         # Find NN from projected source to (original) target embedding
         neighbors_projected_src_trg = find_nearest_neighbor(
             normalize_matrix(self.proj_embedding_source_target),
@@ -120,6 +171,11 @@ class Projection_based_clwe:
         self.train_translation_target = [self.trg_ind2word[target_index] for target_index in [pair[1] for pair in rank_pairs]]
 
     def get_subspace(self):
+        """Get the Source and target Subspace based on the provided translation dictionary.
+
+        Returns:
+
+        """
         print("Length of Original dictionary: {}".format(len(self.train_translation_source)))
         index_source_embedding = []
         index_target_embedding = []
@@ -140,7 +196,14 @@ class Projection_based_clwe:
         self.X_target_embedding = self.target_embedding_matrix[index_target_embedding]
 
     def solve_proscrutes_problem(self, source_to_target):
+        """Solve the Proscrutes Problem.
 
+        Args:
+            source_to_target (boolean): Define the direction of projection.
+
+        Returns:
+
+        """
         if source_to_target:
             U, s, V_t = np.linalg.svd(np.matmul(self.X_source_embedding.transpose(), self.X_target_embedding))
             self.mapping_source_target = np.matmul(U, V_t)

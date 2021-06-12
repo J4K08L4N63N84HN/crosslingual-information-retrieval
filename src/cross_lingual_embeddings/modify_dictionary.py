@@ -6,7 +6,18 @@ from load_monolingual import load_translation_dict, load_embedding
 
 
 def cut_dictionary_to_vocabulary(path_source_language, path_target_language, translation_dict_path, new_translation_dict_path, number_tokens=5000):
+    """ Cut all vocabularies out, which are not in the source and target embedding. Save new translation dictionary.
 
+    Args:
+        path_source_language: Path to source Language.
+        path_target_language: Path to target Language.
+        translation_dict_path: Path to translation Dictionary.
+        new_translation_dict_path: Path to save new translation dictionary.
+        number_tokens: Number of Tokens of source/target language.
+
+    Returns:
+
+    """
     src_embedding_word, _ = load_embedding(path_source_language, number_tokens)
     trg_embedding_word, _ = load_embedding(path_target_language, number_tokens)
     translation_source, translation_target = load_translation_dict(translation_dict_path)

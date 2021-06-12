@@ -7,14 +7,32 @@ except ImportError:
 
 
 def supports_cupy():
+    """Initialize CUDA support
+
+    Returns:
+        obj: cupy package
+
+    """
     return cupy is not None
 
 
 def get_cupy():
+    """Initialize CUDA support
+
+    Returns:
+        obj: cupy package
+
+    """
     return cupy
 
 
 def get_array_module(x):
+    """Initialize cupy support if available, if not, use numpy
+
+        Returns:
+            obj: cupy or numpy package
+
+    """
     if cupy is not None:
         return cupy.get_array_module(x)
     else:
@@ -22,6 +40,12 @@ def get_array_module(x):
 
 
 def asnumpy(x):
+    """Initialize cupy support if available, if not, use numpy
+
+        Returns:
+            obj: cupy or numpy package
+
+    """
     if cupy is not None:
         return cupy.asnumpy(x)
     else:
@@ -29,6 +53,16 @@ def asnumpy(x):
 
 
 def find_nearest_neighbor(src_matrix, trg_matrix, use_batch=False):
+    """Find the nearest neighbor, given 2 embedding matrix
+
+    Args:
+        src_matrix (array): Source Embedding Matrix
+        trg_matrix (array): Target Embedding Matrix
+        use_batch (boolean): Using batch, true or false
+
+    Returns:
+
+    """
     xp = get_array_module(src_matrix)
     if use_batch:
         neighbors = big_matrix_multiplication(src_matrix, trg_matrix.transpose(), get_max=True)
@@ -41,6 +75,15 @@ def find_nearest_neighbor(src_matrix, trg_matrix, use_batch=False):
 
 
 def normalize_matrix(matrix):
+    """Normalize Matrix Embedding.
+
+    Args:
+        matrix (array): Matrix
+
+    Returns:
+        array: Normalized Matrix (axis=1)
+
+    """
     xp = get_array_module(matrix)
     norms = xp.sqrt(xp.sum(xp.square(matrix), axis=1))
     norms[norms == 0] = 1
@@ -50,6 +93,16 @@ def normalize_matrix(matrix):
 
 
 def check_if_neighbors_match(src_neighbor, trg_neighbor):
+    """Check if any source and target neighbors match and return matches
+
+    Args:
+        src_neighbor (list): Source Neighbor List
+        trg_neighbor (list): Target Neighbor List
+
+    Returns:
+        list: Matching of neighbors.
+
+    """
     matching = {}
     for current_neighbor_index in range(len(src_neighbor)):
         # Looking for matches
@@ -60,6 +113,15 @@ def check_if_neighbors_match(src_neighbor, trg_neighbor):
 
 
 def mean_center(matrix):
+    """Center the matrix.
+
+    Args:
+        matrix (array): Matrix
+
+    Returns:
+        array: Center the matrix.
+
+    """
     xp = get_array_module(matrix)
     avg = xp.mean(matrix, axis=0)
     matrix -= avg
@@ -67,6 +129,15 @@ def mean_center(matrix):
 
 
 def vecmap_normalize(matrix):
+    """Normalize Matrix and center and normalize again.
+
+    Args:
+        matrix: Matrix
+
+    Returns:
+        array: Normalize + center + normalize Matrix
+
+    """
     matrix = normalize_matrix(matrix)
     matrix = mean_center(matrix)
     matrix = normalize_matrix(matrix)
@@ -74,7 +145,18 @@ def vecmap_normalize(matrix):
     return matrix
 
 
-def topk_mean(m, k, inplace=False):  # TODO Assuming that axis is 1
+def topk_mean(m, k, inplace=False):
+    """Top-K Mean of samples
+
+    Args:
+        m (array): Matrix
+        k (int): Take the most k
+        inplace: If we need to comvert to numpy/cupy
+
+    Returns:
+        int: topk mean
+
+    """
     xp = get_array_module(m)
     n = m.shape[0]
     ans = xp.zeros(n, dtype=m.dtype)
@@ -93,6 +175,16 @@ def topk_mean(m, k, inplace=False):  # TODO Assuming that axis is 1
 
 
 def dropout(m, p):
+    """Dropout elements from matrix.
+
+    Args:
+        m (array):  Matrix
+        p (int): Probability to randomly drop elements
+
+    Returns:
+        array: Matri with dropped elements
+
+    """
     xp = get_array_module(m)
     if p <= 0.0:
         return m
@@ -102,12 +194,23 @@ def dropout(m, p):
 
 
 def big_matrix_multiplication(a, b, get_max=False, chunk_size=10000):
+    """Do Big matrix multiplication (useful to save memory)
+
+    Args:
+        a (array): Left matrix
+        b (array): Right matrix
+        get_max (boolean): Calculate maximum of each row of resulting matrix
+        chunk_size: Chunk Size of matrix multiplication
+
+    Returns:
+        array: Matrix Multiplication result
+
+    """
     result = []
     num_iters = a.shape[0] // chunk_size + (0 if a.shape[0] % chunk_size == 0 else 1)
     for i in range(num_iters):
-      res_batch = numpy.dot(a[i * chunk_size : (i+1) * chunk_size, :], b)
-      if get_max:
-          res_batch = numpy.argmax(res_batch, axis=1).tolist()
-      result.extend(res_batch)
+        res_batch = numpy.dot(a[i * chunk_size: (i + 1) * chunk_size, :], b)
+        if get_max:
+            res_batch = numpy.argmax(res_batch, axis=1).tolist()
+        result.extend(res_batch)
     return result
-
