@@ -53,6 +53,13 @@ The repository serves two functions.
 Detailed documentation and usage instructions can be found `here <https://crosslingual-information-retrieval.readthedocs.io/en/latest/>`__.
 
 
+Models
+######
+
+We make all our trained models available in this `Drive <https://drive.google.com/drive/folders/1r0UExZMI46dbYx_zfdVCmbPNJC3O8yU9?usp=sharing/>`__.
+
+Furthermore, you can download all related data in the following `Drive <https://drive.google.com/drive/folders/1EuDDZSmv2DWgw3itdGSDwKz3UYIcLVmT?usp=sharing/>`__. 
+
 Credits
 #######
 
