@@ -123,17 +123,17 @@ class PreprocessingEuroParl:
         self.preprocessed["list_named_numbers_source"] = named_numbers(self.dataframe["text_source"])
         self.preprocessed["list_named_numbers_target"] = named_numbers(self.dataframe["text_target"])
 
-    def create_embedding_information(self, embedding):
+    def create_embedding_information(self, embedding, language_pair="en_de"):
         """ Create information based on embeddings.
 
             Args:
                 embedding (str): Type of embedding to create information.
 
         """
-        embedding_array_source_path = "../data/interim/en_de_" + embedding + "_src_emb.pkl"
-        embedding_dictionary_source_path = "../data/interim/en_de_" + embedding + "_src_word.pkl"
-        embedding_array_target_path = "../data/interim/en_de_" + embedding + "_trg_emb.pkl"
-        embedding_dictionary_target_path = "../data/interim/en_de_" + embedding + "_trg_word.pkl"
+        embedding_array_source_path = "../data/interim/" + language_pair + "_" + embedding + "_src_emb.pkl"
+        embedding_dictionary_source_path = "../data/interim/" + language_pair + "_" + embedding + "_src_word.pkl"
+        embedding_array_target_path = "../data/interim/" + language_pair + "_" + embedding + "_trg_emb.pkl"
+        embedding_dictionary_target_path = "../data/interim/" + language_pair + "_" + embedding + "_trg_word.pkl"
 
         embedding_array_normalized_source, embedding_dictionary_source = load_embeddings(
             embedding_array_source_path, embedding_dictionary_source_path)
