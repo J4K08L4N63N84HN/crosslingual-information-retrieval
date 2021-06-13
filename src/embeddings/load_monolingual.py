@@ -1,7 +1,11 @@
-import io
-import numpy as np
+""" Functions to lod embeddings.
+"""
+
 import codecs
+import io
 import pickle
+
+import numpy as np
 
 
 def load_embedding(fname, number_tokens=5000):

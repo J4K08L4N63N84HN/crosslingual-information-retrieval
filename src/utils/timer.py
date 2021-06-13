@@ -1,9 +1,8 @@
 """ Function to show time neeed for the evaluation of a function.
 """
 
-import time
-
 import functools
+import time
 
 
 def timer(function):
@@ -15,6 +14,7 @@ def timer(function):
         Returns:
             result (object): Result of the executed function.
     """
+
     @functools.wraps(function)
     def time_measurement(*args, **kwargs):
         """ Function to measure time elapsed by executing a function.

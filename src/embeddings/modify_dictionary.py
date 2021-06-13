@@ -1,11 +1,16 @@
+""" Functions to modify dictionaries.
+"""
+
 import csv
-import sys
 import os
+import sys
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from load_monolingual import load_translation_dict, load_embedding
 
 
-def cut_dictionary_to_vocabulary(path_source_language, path_target_language, translation_dict_path, new_translation_dict_path, number_tokens=5000):
+def cut_dictionary_to_vocabulary(path_source_language, path_target_language, translation_dict_path,
+                                 new_translation_dict_path, number_tokens=5000):
     """ Cut all vocabularies out, which are not in the source and target embedding. Save new translation dictionary.
 
     Args:
@@ -21,7 +26,7 @@ def cut_dictionary_to_vocabulary(path_source_language, path_target_language, tra
     src_embedding_word, _ = load_embedding(path_source_language, number_tokens)
     trg_embedding_word, _ = load_embedding(path_target_language, number_tokens)
     translation_source, translation_target = load_translation_dict(translation_dict_path)
-    
+
     src_word2ind = {word: i for i, word in enumerate(src_embedding_word)}
     trg_word2ind = {word: i for i, word in enumerate(trg_embedding_word)}
 

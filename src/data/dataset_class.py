@@ -34,6 +34,7 @@ class DataSet:
         self.model_dataset_index = pd.DataFrame()
         self.model_dataset = pd.DataFrame()
         self.retrieval_dataset = pd.DataFrame()
+        self.retrieval_dataset_index = pd.DataFrame()
 
     @timer
     def split_model_retrieval(self, n_model=20000, n_retrieval=5000):
@@ -50,14 +51,18 @@ class DataSet:
         except IndexError:
             print("n_model + n_retrieval must be smaller than the dataset size.")
 
-    def create_model_index(self, n_model=5000, k=5, sample_size_k=100, embedding_source=
-    "sentence_embedding_tf_idf_proc_5k_source", embedding_target="sentence_embedding_tf_idf_proc_5k_target"):
+    def create_model_index(self, n_model=5000, k=5, sample_size_k=100,
+                           embedding_source="sentence_embedding_tf_idf_proc_5k_source",
+                           embedding_target="sentence_embedding_tf_idf_proc_5k_target"):
         """ Generate dataset for modelling a supervised classifier.
 
             Args:
                 n_model (int): Number of preprocessed datapoints used for supervised modelling.
                 k (int): Number of false translated sentences pair for training a supervised classifier.
                 sample_size_k (int): Number of samples from target per source sentence for searching nearest sentences.
+                embedding_source (str): Name of source embeddings
+                embedding_target (str): Name of source embeddings
+
         """
 
         preprocessed_source = self.model_subset[["id_source", embedding_source]]
@@ -77,7 +82,7 @@ class DataSet:
         random_sample_wrong["cosine_similarity"] = cosine_similarity_vector(
             random_sample_wrong["sentence_embedding_tf_idf_proc_5k_source"],
             random_sample_wrong["sentence_embedding_tf_idf_proc_5k_target"])
-        
+
         random_sample_k_index = random_sample_wrong.groupby("id_source")['cosine_similarity'].nlargest(k)
 
         rows = []

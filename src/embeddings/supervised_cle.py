@@ -1,9 +1,13 @@
-import sys
+""" Class to induce crosslingual word embeddings based on projection.
+"""
+
 import os
+import sys
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from load_monolingual import load_translation_dict, load_embedding
 from utils import normalize_matrix, check_if_neighbors_match, \
-find_nearest_neighbor, big_matrix_multiplication
+    find_nearest_neighbor, big_matrix_multiplication
 import numpy as np
 
 
@@ -167,8 +171,10 @@ class Projection_based_clwe:
         if cnt < len(rank_pairs):
             rank_pairs = rank_pairs[:cnt]
         # Update orignal Dictionary
-        self.train_translation_source = [self.src_ind2word[source_index] for source_index in [pair[0] for pair in rank_pairs]]
-        self.train_translation_target = [self.trg_ind2word[target_index] for target_index in [pair[1] for pair in rank_pairs]]
+        self.train_translation_source = [self.src_ind2word[source_index] for source_index in
+                                         [pair[0] for pair in rank_pairs]]
+        self.train_translation_target = [self.trg_ind2word[target_index] for target_index in
+                                         [pair[1] for pair in rank_pairs]]
 
     def get_subspace(self):
         """Get the Source and target Subspace based on the provided translation dictionary.
@@ -201,8 +207,6 @@ class Projection_based_clwe:
         Args:
             source_to_target (boolean): Define the direction of projection.
 
-        Returns:
-
         """
         if source_to_target:
             U, s, V_t = np.linalg.svd(np.matmul(self.X_source_embedding.transpose(), self.X_target_embedding))
@@ -212,8 +216,16 @@ class Projection_based_clwe:
             self.mapping_target_source = np.matmul(U, V_t)
 
     def project_embedding_space(self, source_to_target):
-        
+        """ Project embedding to new space.
+
+                Args:
+                    source_to_target (boolean): Define the direction of projection.
+
+                """
+
         if source_to_target:
-            self.proj_embedding_source_target = big_matrix_multiplication(self.source_embedding_matrix, self.mapping_source_target)
+            self.proj_embedding_source_target = big_matrix_multiplication(self.source_embedding_matrix,
+                                                                          self.mapping_source_target)
         else:
-            self.proj_embedding_target_source = big_matrix_multiplication(self.target_embedding_matrix, self.mapping_target_source)
+            self.proj_embedding_target_source = big_matrix_multiplication(self.target_embedding_matrix,
+                                                                          self.mapping_target_source)
