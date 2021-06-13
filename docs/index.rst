@@ -7,6 +7,7 @@
    :caption: Content
 
    source/src.data
+   source/src.embeddings
    source/src.features
    source/src.models
    source/src.utils
