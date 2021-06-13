@@ -16,6 +16,7 @@ from src.utils.timer import timer
 
 tqdm.pandas()
 
+
 @timer
 def tokenize_sentence(sentence_vector):
     """ Function to tokenize an array of sentences.
@@ -80,7 +81,7 @@ def lemmatize(sentence_vector):
             numpy.array: Array containing the lemmatized words.
     """
     return sentence_vector.progress_apply(lambda token_list:
-        [token.lemma_ for token in token_list])
+                                          [token.lemma_ for token in token_list])
 
 
 @timer
@@ -92,6 +93,7 @@ def lowercase(token_vector):
             numpy.array: Array containing tokenized, lowercased sentence.
     """
     return token_vector.progress_apply(lambda row: list(map(str.lower, row)))
+
 
 @timer
 def lowercase_spacy(token_vector):
@@ -165,7 +167,7 @@ def create_cleaned_text(sentence_vector, stopwords_list):
     """
     token_vector = tokenize_sentence(sentence_vector)
     token_vector_stopwords = remove_stopwords(token_vector, stopwords_list)
-    token_vector_whitespace = strip_whitespace(token_vector)
+    token_vector_whitespace = strip_whitespace(token_vector_stopwords)
     token_vector_lowercase = lowercase(token_vector_whitespace)
     token_vector_stopwords = remove_stopwords(token_vector_lowercase, stopwords_list)
 

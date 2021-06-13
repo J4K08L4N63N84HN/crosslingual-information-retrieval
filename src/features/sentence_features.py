@@ -33,9 +33,8 @@ def relative_difference_numerical(source_array, target_array):
             numpy.array: Array containing the relative differences.
     """
 
-    return (abs(target_array - source_array) / (source_array + target_array)).replace(np.nan, 0).replace(np.inf,
-                                                                                                      0).replace(np.log(
-        0), 0)
+    return (abs(target_array - source_array) /
+            (source_array + target_array)).replace(np.nan, 0).replace(np.inf, 0).replace(np.log(0), 0)
 
 
 @timer
