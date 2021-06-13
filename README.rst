@@ -17,7 +17,18 @@ Table of Contents
 Description
 #################
 
-We make all our code availabe that were used for this project. It contains the data preprocessing, inducing cross-lingual word emnbeddings, training and evaluating all models. Furthermore, we make all models available `Drive <https://drive.google.com/drive/folders/1r0UExZMI46dbYx_zfdVCmbPNJC3O8yU9?usp=sharing/>`__. All raw and preprocessed data can be downloaded in the following `Drive <https://drive.google.com/drive/folders/1EuDDZSmv2DWgw3itdGSDwKz3UYIcLVmT?usp=sharing/>`__. 
+We make all our code availabe that were used for this project. It contains the data preprocessing, inducing cross-lingual word embeddings, training and evaluating all models. You can find the code for each part in the following table: 
+
+*  `Data Preprocessing <https://github.com/J4K08L4N63N84HN/crosslingual-information-retrieval/tree/main/src/data/>`__
+*  `Feature Generation <https://github.com/J4K08L4N63N84HN/crosslingual-information-retrieval/tree/main/src/features>`__
+*  `Inducing CLWE <https://github.com/J4K08L4N63N84HN/crosslingual-information-retrieval/tree/main/src/cross_lingual_embeddings>`__
+*  `Training and Evaluating Supervised Models <https://github.com/J4K08L4N63N84HN/crosslingual-information-retrieval/tree/main/src/models>`__
+
+All Experiments done were written in Jupyter Notebooks, which can be found in this `Folder <https://github.com/J4K08L4N63N84HN/crosslingual-information-retrieval/tree/main/notebooks>`__
+
+Furthermore, we make all models available `Drive <https://drive.google.com/drive/folders/1r0UExZMI46dbYx_zfdVCmbPNJC3O8yU9?usp=sharing/>`__. All raw and preprocessed data can be downloaded in the following `Drive <https://drive.google.com/drive/folders/1EuDDZSmv2DWgw3itdGSDwKz3UYIcLVmT?usp=sharing/>`__. 
+
+Our results are summarized in the following table:
 
 
 
