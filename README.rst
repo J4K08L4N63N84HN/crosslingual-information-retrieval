@@ -49,14 +49,14 @@ To use this code you have to follow these steps:
 
 .. code-block::
 
-    $  conda env create --file environment.yaml
-    $  conda activate crosslingual-information-retrieval
+    $  conda create -n animate_logos python=3.8
+    $  conda activate animate_logos
 
-3. Set the conda environment on your jupyter notebook:
+3. Install the dependencies:
 
 .. code-block::
 
-    $ python -m ipykernel install --user --name=crosslingual-information-retrieval
+    $ pip install -r requirements.txt
 
 
 Credits
