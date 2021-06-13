@@ -30,6 +30,7 @@ Furthermore, we make all models available `Drive <https://drive.google.com/drive
 
 Our results are summarized in the following table:
 
+!(../main/reports/figures/final_results.png)
 
 
 How to Install
