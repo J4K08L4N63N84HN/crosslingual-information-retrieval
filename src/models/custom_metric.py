@@ -1,5 +1,8 @@
-from sklearn.metrics import recall_score, f1_score, log_loss, precision_score
+""" Functions for custom metrics.
+"""
+
 import datasets
+from sklearn.metrics import recall_score, f1_score, log_loss, precision_score
 
 _CITATION = """
 """
@@ -43,6 +46,7 @@ class custom_metric(datasets.Metric):
     """Create Custom Metric for huggingface. Computes F1, Accuracy, Recall, Precision and Log Loss.
 
     """
+
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,

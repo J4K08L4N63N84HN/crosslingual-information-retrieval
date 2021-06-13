@@ -16,24 +16,22 @@ class FeatureGeneration:
         preprocessed_dataset (dataframe): Preprocessed dataset.
         feature_dataframe (dataframe): Dataset containing feature for training a model.
         feature_difference_list (list): List of preprocessed columns that should be compared.
-        k (int): Number of principal components.
     """
 
     def __init__(self, dataset_index, preprocessed_dataset):
         """ Initialize dataframe by importing preprocessed dataset..
 
             Args:
-                dataset (str): Path of the europarl source dataset.
-                embedding_list (list): List of used embeddings.
-                k (int): Number of principal components.
+                dataset_index (dataframe): Dataframe with index for the chosen dataset.
+                preprocessed_dataset (dataframe): Dataframe with preprocessed sentence pairs.
         """
         self.dataset_index = dataset_index
         self.preprocessed_source = preprocessed_dataset.filter(regex='source$', axis=1)
         self.preprocessed_target = preprocessed_dataset.filter(regex='target$', axis=1)
         self.preprocessed_dataset = self.dataset_index.merge(self.preprocessed_source, how='left',
-                                                               on="id_source").merge(self.preprocessed_target,
-                                                                                     how='left',
-                                                                                     on="id_target")
+                                                             on="id_source").merge(self.preprocessed_target,
+                                                                                   how='left',
+                                                                                   on="id_target")
         self.feature_dataframe = pd.DataFrame()
         self.feature_difference_list = [
             'number_punctuations_total', 'number_words',
@@ -121,4 +119,4 @@ class FeatureGeneration:
             self.preprocessed_dataset[
                 "token_preprocessed_embedding_target"],
             self.preprocessed_dataset[
-                f"translated_to_target_{embedding}_source"]))/2
+                f"translated_to_target_{embedding}_source"])) / 2

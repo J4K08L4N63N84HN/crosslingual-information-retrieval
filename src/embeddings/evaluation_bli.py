@@ -1,6 +1,11 @@
-import numpy as np
-import sys
+""" Class for evaluation methods on the BLI task.
+"""
+
 import os
+import sys
+
+import numpy as np
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from utils import normalize_matrix
 from load_monolingual import load_translation_dict

@@ -75,7 +75,6 @@ def lemmatize(sentence_vector):
 
         Args:
             sentence_vector (array): Array containing text.
-            nlp_language (object): Spacy pipeline.
 
         Returns:
             numpy.array: Array containing the lemmatized words.
@@ -141,6 +140,7 @@ def create_cleaned_token_embedding(sentence_vector, nlp_language, stopwords_list
     Args:
         sentence_vector (numpy.array): Array containing text.
         nlp_language (object): Spacy pipeline.
+        stopwords_list (list) : List of stopwords.
 
     Returns:
         array: Cleaned array as Bag of Words.
@@ -161,6 +161,7 @@ def create_cleaned_text(sentence_vector, stopwords_list):
 
     Args:
         sentence_vector (array): Array containing text.
+        stopwords_list (list): List of stopwords.
 
     Returns:
         array: Cleaned array as Bag of Word.
@@ -265,12 +266,11 @@ def average_characters(character_vector, word_vector):
 
 
 @timer
-def number_pos(sentence_vector, nlp_language, pos):
+def number_pos(sentence_vector, pos):
     """ Function to generate the number of a given part-of-speech tag in a given vector of Bag of Words-Sentences.
 
        Args:
            sentence_vector (numpy.array): Bag of Words array.
-           nlp_language (str): Language of the array.
            pos: a given part-of-speech tag.
 
        Returns:
@@ -282,12 +282,11 @@ def number_pos(sentence_vector, nlp_language, pos):
 
 
 @timer
-def number_times(sentence_vector, nlp_language, tense):
+def number_times(sentence_vector, tense):
     """ Function to generate the number of a given tense verb tag in a given vector of Bag of Words-Sentences.
 
     Args:
            sentence_vector (numpy.array): Bag of Words array.
-           nlp_language (str): Language of the array.
            tense: a given verb tense tag.
 
     Returns:
@@ -299,33 +298,33 @@ def number_times(sentence_vector, nlp_language, tense):
             "Tense") == tense]))
 
 
-@timer
-def polarity(sentence_vector, textblob_language):
-    """ Function to generate the polarity in a given vector of Bag of Words-sentences.
-
-       Args:
-           sentence_vector (array): Bag of Words array.
-           textblob_language (str): Language of the array.
-
-       Returns:
-           array: Array containing the polarity (sentiment analyses).
-       """
-    return sentence_vector.progress_apply(lambda sentence: textblob_language(sentence).sentiment.polarity)
-
-
-@timer
-def subjectivity(sentence_vector, textblob_language):
-    """ Function to generate the subjectivity in a given vector of Bag of Words-sentences.
-
-        Args:
-            sentence_vector (array): Bag of Words array.
-            textblob_language (str): Language of the array.
-
-        Returns:
-            array: Array containing the subjectivity (sentiment analyses).
-
-        """
-    return sentence_vector.progress_apply(lambda sentence: textblob_language(sentence).sentiment.subjectivity)
+# @timer
+# def polarity(sentence_vector, textblob_language):
+#     """ Function to generate the polarity in a given vector of Bag of Words-sentences.
+#
+#        Args:
+#            sentence_vector (array): Bag of Words array.
+#            textblob_language (str): Language of the array.
+#
+#        Returns:
+#            array: Array containing the polarity (sentiment analyses).
+#        """
+#     return sentence_vector.progress_apply(lambda sentence: textblob_language(sentence).sentiment.polarity)
+#
+#
+# @timer
+# def subjectivity(sentence_vector, textblob_language):
+#     """ Function to generate the subjectivity in a given vector of Bag of Words-sentences.
+#
+#         Args:
+#             sentence_vector (array): Bag of Words array.
+#             textblob_language (str): Language of the array.
+#
+#         Returns:
+#             array: Array containing the subjectivity (sentiment analyses).
+#
+#         """
+#     return sentence_vector.progress_apply(lambda sentence: textblob_language(sentence).sentiment.subjectivity)
 
 
 @timer

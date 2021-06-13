@@ -1,12 +1,17 @@
-import torch
-from transformers import AutoTokenizer
+""" Class to train text encoders.
+"""
+
+import os
+import pickle
+
 import numpy as np
+import torch
 from datasets import load_metric
 from scipy.special import softmax
 from torch.nn import CrossEntropyLoss
-from transformers import Trainer, TrainingArguments
-from torch.utils.data import DataLoader, SequentialSampler
-import pickle
+from torch.utils.data import DataLoader
+from transformers import AutoTokenizer, Trainer
+
 np.random.seed(42)
 CLASS_IMBALANCE_WEIGHTS = [11 / (2 * 10), 11 / (2 * 1)]
 NUM_LABELS = 2

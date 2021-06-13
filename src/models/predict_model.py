@@ -1,12 +1,16 @@
-import pandas as pd
-import numpy as np
-from sklearn.utils import shuffle
-import itertools
-from tqdm import tqdm
-import os
-from scipy.special import softmax
+""" Functions to apply models.
+"""
+
 import glob
-#from pickle5 import pickle
+import itertools
+import os
+
+import numpy as np
+import pandas as pd
+from pickle5 import pickle
+from scipy.special import softmax
+from sklearn.utils import shuffle
+from tqdm import tqdm
 
 
 def MAP_score(source_id, target_labels, prediction):
@@ -110,6 +114,7 @@ def feature_selection(model, scaler, trainset, testset, starting_features, added
             testset (dataframe): Dataframe containing our testing data.
             starting_features (array): Array containing the starting features for our first training.
             added_features (array): Array containing the features to be added for further training.
+            threshold_map_feature_selection (flot): Treshold for map feature selection.
 
     """
     # get the first features to train (embedding features)
@@ -247,8 +252,8 @@ def downsample(imbalanced_data):
     index_balanced = i_class0_downsampled.tolist() + i_class1.tolist()
     index_balanced = shuffle(index_balanced, random_state=42)
     return imbalanced_data.iloc[index_balanced, :]
-    
-    
+
+
 def evaluate_text_encoder(prediction_path_folder, feature_retrieval):
     """ Evaluate Text Encoder with given predictions (must be done beforehand) on retrieval dataset
 
@@ -261,7 +266,8 @@ def evaluate_text_encoder(prediction_path_folder, feature_retrieval):
 
     """
     total_map_score = 0
-    for index, filepath in enumerate(sorted(glob.iglob(os.path.join(prediction_path_folder, "*")), key=os.path.getmtime)):
+    for index, filepath in enumerate(
+            sorted(glob.iglob(os.path.join(prediction_path_folder, "*")), key=os.path.getmtime)):
         start_index = int(filepath.split("_")[-2])
         end_index = int(filepath.split("_")[-1].split(".")[0])
         with open(filepath, 'rb') as handle:
@@ -271,13 +277,13 @@ def evaluate_text_encoder(prediction_path_folder, feature_retrieval):
         pred_prob = softmax(logits, axis=1)
 
         map_score = MAP_score(feature_retrieval["source_id"][start_index:end_index],
-                            feature_retrieval["Translation"][start_index:end_index],
-                            pred_prob)
+                              feature_retrieval["Translation"][start_index:end_index],
+                              pred_prob)
 
         # print("MAP score from index {} to {} is: {}".format(start_index, end_index, map_score))
         total_map_score += map_score
 
-    total_map_score /= index+1
+    total_map_score /= index + 1
     print("Result: MAP Score is: {}".format(total_map_score))
 
     return total_map_score

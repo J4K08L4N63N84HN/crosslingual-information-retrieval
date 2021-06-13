@@ -1,12 +1,17 @@
-from transformers import XLMRobertaModel, XLMRobertaTokenizer
-import torch
-import numpy as np
-import tqdm.notebook as tq
-import sys
+""" Class to use text encoders.
+"""
+
 import os
+import sys
+
+import numpy as np
+import torch
+import tqdm.notebook as tq
+from transformers import XLMRobertaModel, XLMRobertaTokenizer
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from utils import normalize_matrix
-from load_monolingual import load_translation_dict, load_embedding
+from load_monolingual import load_translation_dict
 
 
 class TextEncoders:

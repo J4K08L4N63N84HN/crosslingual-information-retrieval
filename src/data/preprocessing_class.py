@@ -43,8 +43,8 @@ class PreprocessingEuroParl:
         """ Preprocess the source sentence dataset
 
             Args:
-                stopwords_source (list): List of stopwords to remove and count.
-                stopwords_target (list): List of stopwords to remove and count.
+                stopword_source (list): List of stopwords to remove and count.
+                stopword_target (list): List of stopwords to remove and count.
                 nlp_source (spacy pipeline): Spacy pipeline for preprocessing.
                 nlp_target (spacy pipeline): Spacy pipeline for preprocessing.
 
@@ -69,8 +69,6 @@ class PreprocessingEuroParl:
         Args:
             nlp_source (spacy pipeline): Spacy pipeline for preprocessing.
             nlp_target (spacy pipeline): Spacy pipeline for preprocessing.
-            textblob_source (textblob object): Textblob object for sentiment analysis.
-            textblob_target (textblob object): Textblob object for sentiment analysis.
         """
         self.preprocessed["number_punctuations_total_source"] = number_punctuations_total(
             self.dataframe["text_preprocessed_source"])

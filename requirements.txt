@@ -21,3 +21,4 @@ xgboost~=1.4.2
 transformers~=4.6.1
 torch~=1.8.1
 datasets~=1.8.0
+pickle5~=0.0.11

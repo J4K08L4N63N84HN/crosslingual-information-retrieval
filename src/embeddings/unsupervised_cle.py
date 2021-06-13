@@ -1,11 +1,16 @@
-import sys
-import os
+""" Functions for unsupervised crosslingual word embeddings.
+"""
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+import os
+import sys
+import time
+
+import numpy as np
+
 from load_monolingual import load_embedding
 from utils import vecmap_normalize, supports_cupy, get_cupy, topk_mean, dropout
-import numpy as np
-import time
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 try:
     import cupy
