@@ -6,7 +6,7 @@ Crosslingual information retrieval
 .. image:: https://img.shields.io/github/stars/J4K08L4N63N84HN/crosslingual-information-retrieval?style=social   :alt: GitHub Repo stars
 
 
-This project implements a supervised and an unsupervised crosslingual information retrieval model
+Cross-Lingual Information Retrieval is the task of getting information in a different language than the original query. Our goal is to implement a lightweight system, unsupervised and supervised, to recognize the translation of a sentence in a large collection of documents in a different language. Testing different cross-lingual word embedding- and text-based features with wide-ranging parameter combinations, our best model, the MLPClassifier, achieved a Mean Average Precision of 0.8459 on our English-German test collection. Our lightweight system also demonstrates zero-shot performance in other languages, such as Italian and Polish. We compare our results to the SOTA, but resource-hungry transformer model XLM-R.
 
 
 Table of Contents
@@ -48,7 +48,7 @@ To use this code you have to follow these steps:
 How to Use
 ##########
 
-The repository serves two functions.
+The repository serves two functions: Inducing a cross-lingual word embedding and using different models for the translation retrieval task.
 
 Detailed documentation and usage instructions can be found `here <https://crosslingual-information-retrieval.readthedocs.io/en/latest/>`__.
 
