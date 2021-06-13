@@ -58,6 +58,7 @@ To use this code you have to follow these steps:
 
     $ pip install -r requirements.txt
 
+For a detailed documentation you can refere to `here <https://crosslingual-information-retrieval.readthedocs.io/en/latest/index.html>`__ or create your own sphinx documentation with
 
 Credits
 #######
@@ -67,9 +68,6 @@ The project started in March 2021 as a Information Retrieval project at the Univ
 * `Minh Duc Bui <https://github.com/MinhDucBui/>`__
 * `Jakob Langenbahn <https://github.com/J4K08L4N63N84HN/>`__
 * `Niklas Sabel <https://github.com/NiklasSabel/>`__
-
-Reference
-#########
 
 License
 #######
