@@ -127,6 +127,7 @@ class PreprocessingEuroParl:
         """ Create information based on embeddings.
 
             Args:
+                language_pair:
                 embedding (str): Type of embedding to create information.
 
         """

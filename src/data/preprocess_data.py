@@ -59,12 +59,13 @@ def remove_stopwords(token_vector, stopwords_list):
 
         Args:
             token_vector (numpy.array): Array containing text.
-            stopwords_language (list): List of stopwords in a specific language.
+            stopwords_list (list): List of stopwords in a specific language.
 
         Returns:
             numpy.array: Array containing tokenized sentence removed stopwords.
     """
-    return token_vector.progress_apply(lambda token_list: [word for word in token_list if word is not stopwords_list])
+
+    return token_vector.progress_apply(lambda token_list: [word for word in token_list if word not in stopwords_list])
 
 
 @timer
@@ -143,13 +144,13 @@ def create_cleaned_token_embedding(sentence_vector, nlp_language, stopwords_list
         array: Cleaned array as Bag of Words.
     """
     token_vector_spacy = spacy(sentence_vector, nlp_language)
-    token_vector_stopwords = remove_stopwords(token_vector_spacy, stopwords_list)
-    token_vector_punctuation = remove_punctuation(token_vector_stopwords)
+    token_vector_punctuation = remove_punctuation(token_vector_spacy)
     token_vector_numbers = remove_numbers(token_vector_punctuation)
     sentence_vector_lemmatized = lemmatize(token_vector_numbers)
     token_vector_preprocessed = lowercase_spacy(sentence_vector_lemmatized)
+    token_vector_stopwords = remove_stopwords(token_vector_preprocessed, stopwords_list)
 
-    return token_vector_preprocessed
+    return token_vector_stopwords
 
 
 @timer
@@ -164,10 +165,11 @@ def create_cleaned_text(sentence_vector, stopwords_list):
     """
     token_vector = tokenize_sentence(sentence_vector)
     token_vector_stopwords = remove_stopwords(token_vector, stopwords_list)
-    token_vector_whitespace = strip_whitespace(token_vector_stopwords)
+    token_vector_whitespace = strip_whitespace(token_vector)
     token_vector_lowercase = lowercase(token_vector_whitespace)
+    token_vector_stopwords = remove_stopwords(token_vector_lowercase, stopwords_list)
 
-    return token_vector_lowercase
+    return token_vector_stopwords
 
 
 @timer
