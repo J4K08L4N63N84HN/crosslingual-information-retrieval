@@ -30,8 +30,8 @@ Furthermore, we make all models available `Drive <https://drive.google.com/drive
 
 Our results are summarized in the following table:
 
-https://github.com/J4K08L4N63N84HN/crosslingual-information-retrieval/blob/main/reports/figures/final_results.png
 
+.. image:: https://github.com/J4K08L4N63N84HN/crosslingual-information-retrieval/blob/main/reports/figures/final_results.png
 
 How to Install
 ##############
