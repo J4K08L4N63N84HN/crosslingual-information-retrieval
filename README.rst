@@ -21,7 +21,7 @@ We make all our code availabe that were used for this project. It contains the d
 
 *  `Data Preprocessing <https://github.com/J4K08L4N63N84HN/crosslingual-information-retrieval/tree/main/src/data/>`__
 *  `Feature Generation <https://github.com/J4K08L4N63N84HN/crosslingual-information-retrieval/tree/main/src/features>`__
-*  `Inducing CLWE <https://github.com/J4K08L4N63N84HN/crosslingual-information-retrieval/tree/main/src/cross_lingual_embeddings>`__
+*  `Inducing CLWE <https://github.com/J4K08L4N63N84HN/crosslingual-information-retrieval/tree/main/src/embeddings>`__
 *  `Training and Evaluating Supervised Models <https://github.com/J4K08L4N63N84HN/crosslingual-information-retrieval/tree/main/src/models>`__
 
 All Experiments done were written in Jupyter Notebooks, which can be found in this `Folder <https://github.com/J4K08L4N63N84HN/crosslingual-information-retrieval/tree/main/notebooks>`__
