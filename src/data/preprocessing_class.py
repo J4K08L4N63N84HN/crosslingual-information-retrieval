@@ -105,17 +105,15 @@ class PreprocessingEuroParl:
         self.dataframe["text_target_spacy"] = spacy(self.dataframe["text_target"], nlp_target)
 
         for pos in self.pos_list:
-            self.preprocessed[f"number_{pos}_source"] = number_pos(self.dataframe["text_source_spacy"], nlp_source,
+            self.preprocessed[f"number_{pos}_source"] = number_pos(self.dataframe["text_source_spacy"],
                                                                    pos)
-            self.preprocessed[f"number_{pos}_target"] = number_pos(self.dataframe["text_target_spacy"], nlp_target,
+            self.preprocessed[f"number_{pos}_target"] = number_pos(self.dataframe["text_target_spacy"],
                                                                    pos)
 
         for tense in self.tense_list:
             self.preprocessed[f"number_{tense}_source"] = number_times(self.dataframe["text_source_spacy"],
-                                                                       nlp_source,
                                                                        tense)
             self.preprocessed[f"number_{tense}_target"] = number_times(self.dataframe["text_target_spacy"],
-                                                                       nlp_target,
                                                                        tense)
 
         self.preprocessed["list_named_numbers_source"] = named_numbers(self.dataframe["text_source"])

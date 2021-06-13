@@ -7,6 +7,8 @@
     :members:
 .. automodule:: src.data.preprocessing_class
     :members:
+.. automodule:: src.data.utils
+    :members:
 """
 from .dataset_class import DataSet
 from .import_data import create_data_subset, import_data
@@ -17,3 +19,4 @@ from .preprocess_data import lemmatize, tokenize_sentence, strip_whitespace, low
     load_embeddings, pca_embeddings, word_embeddings, create_translation_dictionary, translate_words, \
     sentence_embedding_average, tf_idf_vector, sentence_embedding_tf_idf
 from .preprocessing_class import PreprocessingEuroParl
+from .utils import get_sentence_pairs
