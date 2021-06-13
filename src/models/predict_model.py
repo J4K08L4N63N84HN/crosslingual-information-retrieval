@@ -6,7 +6,7 @@ from tqdm import tqdm
 import os
 from scipy.special import softmax
 import glob
-from pickle5 import pickle
+#from pickle5 import pickle
 
 
 def MAP_score(source_id, target_labels, prediction):
