@@ -49,8 +49,8 @@ To use this code you have to follow these steps:
 
 .. code-block::
 
-    $  conda create -n animate_logos python=3.8
-    $  conda activate animate_logos
+    $  conda create -n crosslingual-information-retrieval python=3.8
+    $  conda activate crosslingual-information-retrieval
 
 3. Install the dependencies:
 
